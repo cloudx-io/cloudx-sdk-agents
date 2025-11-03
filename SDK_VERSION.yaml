@@ -110,7 +110,7 @@ update_checklist:
   - "Run ./scripts/validate_agent_apis.sh"
   - "Review git diff for public API changes"
   - "Update agent files with new API names"
-  - "Update code examples in integration_agent_claude.md"
+  - "Update code examples in docs/INTEGRATION_GUIDE.md"
   - "Run agent validation tests"
   - "Update agents_last_updated date"
   - "Commit with message: 'Update agents for SDK vX.X.X'"
