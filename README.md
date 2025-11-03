@@ -8,7 +8,7 @@ Automated CloudX SDK integration in 20 minutes with AI-powered agents.
 bash <(curl -fsSL https://raw.githubusercontent.com/cloudx-io/cloudx-sdk-agents/main/scripts/install.sh)
 cd your-android-project
 claude
-"Use cloudx-android-integrator to integrate CloudX SDK with app key: YOUR_KEY"
+"@agent-cloudx-android-integrator to integrate CloudX SDK with app key: YOUR_KEY"
 ```
 
 ## Agents
