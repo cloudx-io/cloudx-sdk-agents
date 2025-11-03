@@ -4,65 +4,99 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Purpose
 
-This repository contains specialized Claude Code agents for automating CloudX Android SDK integration. The agents help Android app publishers integrate CloudX SDK as a primary ad mediation layer with proper fallback to AdMob/AppLovin, reducing integration time from 4-6 hours to ~20 minutes.
+This repository contains specialized Claude Code agents for automating CloudX SDK integration across multiple platforms (Android, Flutter, and future iOS). The agents help app publishers integrate CloudX SDK as a primary ad mediation layer with proper fallback to AdMob/AppLovin, reducing integration time from 4-6 hours to ~20 minutes.
+
+**Supported Platforms:**
+- **Android** (v0.5.0) - 4 agents - Production ready
+- **Flutter** (v0.1.2) - 4 agents - Production ready
+- **iOS** - Coming soon
 
 ## Architecture Overview
 
-### Multi-Agent System
-The repository implements a specialized multi-agent architecture where each agent handles a specific aspect of SDK integration:
+### Multi-Agent System (Per Platform)
+The repository implements a specialized multi-agent architecture where each agent handles a specific aspect of SDK integration. Each platform has its own set of 4 specialized agents:
 
 ```
 User/Main Agent (Coordinator)
     │
-    ├──► cloudx-android-integrator     (Implementation)
-    ├──► cloudx-android-auditor        (Validation)
-    ├──► cloudx-android-build-verifier (Testing)
-    └──► cloudx-android-privacy-checker (Compliance)
+    ├──► Android Agents
+    │    ├── cloudx-android-integrator     (Implementation)
+    │    ├── cloudx-android-auditor        (Validation)
+    │    ├── cloudx-android-build-verifier (Testing)
+    │    └── cloudx-android-privacy-checker (Compliance)
+    │
+    └──► Flutter Agents
+         ├── cloudx-flutter-integrator     (Implementation)
+         ├── cloudx-flutter-auditor        (Validation)
+         ├── cloudx-flutter-build-verifier (Testing)
+         └── cloudx-flutter-privacy-checker (Compliance)
 ```
 
-**Agent Definitions**: All agents are defined as markdown files in `.claude/agents/` with frontmatter specifying:
-- `name`: Agent identifier
+**Agent Definitions**: All agents are defined as markdown files in `.claude/agents/<platform>/` with frontmatter specifying:
+- `name`: Agent identifier (e.g., `cloudx-flutter-integrator`)
 - `description`: When to invoke the agent (critical for auto-routing)
 - `tools`: Available tools (Read, Write, Edit, Grep, Glob, Bash)
 - `model`: Preferred model (sonnet, haiku, opus)
 
 ### Key Components
 
-1. **Agent Files** (`.claude/agents/`)
-   - `cloudx-android-integrator.md` - Implements SDK integration with fallback logic
-   - `cloudx-android-auditor.md` - Validates that existing fallback paths remain intact
-   - `cloudx-android-build-verifier.md` - Runs Gradle builds and reports errors
-   - `cloudx-android-privacy-checker.md` - Validates GDPR/CCPA/COPPA compliance
+1. **Agent Files** (`.claude/agents/<platform>/`)
+   - **Android** (`.claude/agents/android/`)
+     - `cloudx-android-integrator.md` - Implements SDK integration with fallback logic
+     - `cloudx-android-auditor.md` - Validates that existing fallback paths remain intact
+     - `cloudx-android-build-verifier.md` - Runs Gradle builds and reports errors
+     - `cloudx-android-privacy-checker.md` - Validates GDPR/CCPA/COPPA compliance
 
-2. **Documentation** (`docs/`)
-   - `SETUP.md` - Installation and setup instructions
-   - `INTEGRATION_GUIDE.md` - Complete integration guide with examples
-   - `ORCHESTRATION.md` - Agent coordination and workflow patterns
+   - **Flutter** (`.claude/agents/flutter/`)
+     - `cloudx-flutter-integrator.md` - Implements SDK integration with fallback logic
+     - `cloudx-flutter-auditor.md` - Validates that existing fallback paths remain intact
+     - `cloudx-flutter-build-verifier.md` - Runs Flutter builds and reports errors
+     - `cloudx-flutter-privacy-checker.md` - Validates GDPR/CCPA/COPPA compliance
+
+2. **Documentation** (`docs/<platform>/`)
+   - **Android** (`docs/android/`)
+     - `SETUP.md` - Installation and setup instructions
+     - `INTEGRATION_GUIDE.md` - Complete integration guide with examples
+     - `ORCHESTRATION.md` - Agent coordination and workflow patterns
+
+   - **Flutter** (`docs/flutter/`)
+     - `SETUP.md` - Installation and setup instructions
+     - `INTEGRATION_GUIDE.md` - Complete integration guide with examples
+     - `ORCHESTRATION.md` - Agent coordination and workflow patterns
 
 3. **Scripts** (`scripts/`)
-   - `install.sh` - Installs agents globally or locally
-   - `validate_agent_apis.sh` - Validates agent documentation matches SDK version
-   - `check_api_coverage.sh` - Checks API documentation coverage
+   - `install.sh` - Installs agents globally or locally (supports --platform flag)
+   - **Android** (`scripts/android/`)
+     - `validate_agent_apis.sh` - Validates agent documentation matches SDK version
+     - `check_api_coverage.sh` - Checks API documentation coverage
+   - **Flutter** (`scripts/flutter/`)
+     - `validate_agent_apis.sh` - Validates agent documentation matches SDK version
 
 4. **SDK Version Tracking** (`SDK_VERSION.yaml`)
-   - Tracks which CloudX SDK version the agents are synchronized with
-   - Documents critical API signatures that agents depend on
-   - Lists files that contain API references requiring updates
-   - Provides update checklist for SDK version changes
+   - Tracks which CloudX SDK version the agents are synchronized with (per platform)
+   - Documents critical API signatures that agents depend on (per platform)
+   - Lists files that contain API references requiring updates (per platform)
+   - Provides update checklist for SDK version changes (per platform)
 
-## CloudX SDK Integration Pattern
+## CloudX SDK Integration Pattern (All Platforms)
 
 The agents implement a "first look" pattern where CloudX SDK is tried first, with fallback to existing ad SDKs:
 
 ```
 CloudX SDK (Primary - First Look)
     │
-    │ onAdLoadFailed
+    │ onAdLoadFailed (Android/Flutter)
     ▼
 Secondary Mediation (Fallback)
     ├── Google AdMob
     └── AppLovin MAX
 ```
+
+**Important**: If no existing ad SDK is detected, the integrator will implement **standalone CloudX integration** (no fallback).
+
+## Platform-Specific Integration Details
+
+### Android CloudX SDK API Reference (v0.5.0)
 
 **Critical Implementation Details**:
 - CloudX SDK **must** be initialized before attempting ad loads
@@ -70,8 +104,6 @@ Secondary Mediation (Fallback)
 - Fallback logic triggers in `onAdLoadFailed` callbacks
 - AdMob ads are **single-use** (must reload after dismiss)
 - AppLovin ads are **reusable** (can call loadAd() on same instance)
-
-### CloudX SDK API Reference (v0.5.0)
 
 **Initialization**:
 ```kotlin

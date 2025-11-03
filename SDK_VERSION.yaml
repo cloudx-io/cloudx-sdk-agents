@@ -1,119 +1,242 @@
-# CloudX SDK Version Tracking for Agent Documentation
-# This file tracks which SDK version the agent documentation is synchronized with
+# CloudX SDK Version Tracking for Agent Documentation (Multi-Platform)
+# This file tracks SDK versions across platforms that agent documentation is synchronized with
 
-sdk_version: "0.5.0"
-agents_last_updated: "2025-11-03"
-verified_against_commit: "3b82ced"  # Fixed agent documentation API references
+# Platform-specific SDK versions
+platforms:
+  android:
+    sdk_version: "0.5.0"
+    agents_last_updated: "2025-11-03"
+    verified_against_commit: "3b82ced"  # Fixed agent documentation API references
 
-# Critical API signatures that agents depend on
+  flutter:
+    sdk_version: "0.1.2"
+    flutter_sdk_min: "3.0.0"
+    dart_sdk_min: "3.0.0"
+    agents_last_updated: "2025-11-04"
+    verified_against_commit: "TBD"  # Initial Flutter agent implementation
+
+# Critical API signatures that agents depend on (Platform-specific)
 api_signatures:
-  initialization:
-    class: "CloudXInitializationParams"
-    constructor: "CloudXInitializationParams(appKey: String)"
-    listener: "CloudXInitializationListener"
-    callbacks:
-      - "onInitialized()"
-      - "onInitializationFailed(cloudXError: CloudXError)"
+  android:
+    initialization:
+      class: "CloudXInitializationParams"
+      constructor: "CloudXInitializationParams(appKey: String)"
+      listener: "CloudXInitializationListener"
+      callbacks:
+        - "onInitialized()"
+        - "onInitializationFailed(cloudXError: CloudXError)"
 
-  banner:
-    factory: "CloudX.createBanner(placementName: String): CloudXAdView"
-    listener: "CloudXAdViewListener"
-    load_required: true
-    callbacks:
-      - "onAdLoaded(cloudXAd: CloudXAd)"
-      - "onAdLoadFailed(cloudXError: CloudXError)"
-      - "onAdDisplayed(cloudXAd: CloudXAd)"
-      - "onAdClicked(cloudXAd: CloudXAd)"
-      - "onAdHidden(cloudXAd: CloudXAd)"
-      - "onAdDisplayFailed(cloudXError: CloudXError)"
-      - "onAdExpanded(cloudXAd: CloudXAd)"
-      - "onAdCollapsed(cloudXAd: CloudXAd)"
+    banner:
+      factory: "CloudX.createBanner(placementName: String): CloudXAdView"
+      listener: "CloudXAdViewListener"
+      load_required: true
+      callbacks:
+        - "onAdLoaded(cloudXAd: CloudXAd)"
+        - "onAdLoadFailed(cloudXError: CloudXError)"
+        - "onAdDisplayed(cloudXAd: CloudXAd)"
+        - "onAdClicked(cloudXAd: CloudXAd)"
+        - "onAdHidden(cloudXAd: CloudXAd)"
+        - "onAdDisplayFailed(cloudXError: CloudXError)"
+        - "onAdExpanded(cloudXAd: CloudXAd)"
+        - "onAdCollapsed(cloudXAd: CloudXAd)"
 
-  interstitial:
-    factory: "CloudX.createInterstitial(placementName: String): CloudXInterstitialAd"
-    listener: "CloudXInterstitialListener"
-    load_required: true
-    ready_check: "isAdReady: Boolean"  # property, not method
-    show_method: "show()"  # no parameters
-    callbacks:
-      - "onAdLoaded(cloudXAd: CloudXAd)"
-      - "onAdLoadFailed(cloudXError: CloudXError)"
-      - "onAdDisplayed(cloudXAd: CloudXAd)"
-      - "onAdClicked(cloudXAd: CloudXAd)"
-      - "onAdHidden(cloudXAd: CloudXAd)"
-      - "onAdDisplayFailed(cloudXError: CloudXError)"
+    interstitial:
+      factory: "CloudX.createInterstitial(placementName: String): CloudXInterstitialAd"
+      listener: "CloudXInterstitialListener"
+      load_required: true
+      ready_check: "isAdReady: Boolean"  # property, not method
+      show_method: "show()"  # no parameters
+      callbacks:
+        - "onAdLoaded(cloudXAd: CloudXAd)"
+        - "onAdLoadFailed(cloudXError: CloudXError)"
+        - "onAdDisplayed(cloudXAd: CloudXAd)"
+        - "onAdClicked(cloudXAd: CloudXAd)"
+        - "onAdHidden(cloudXAd: CloudXAd)"
+        - "onAdDisplayFailed(cloudXError: CloudXError)"
 
-  rewarded:
-    factory: "CloudX.createRewardedInterstitial(placementName: String): CloudXRewardedInterstitialAd"
-    listener: "CloudXRewardedInterstitialListener"
-    load_required: true
-    ready_check: "isAdReady: Boolean"
-    show_method: "show()"
-    callbacks:
-      - "onAdLoaded(cloudXAd: CloudXAd)"
-      - "onAdLoadFailed(cloudXError: CloudXError)"
-      - "onAdDisplayed(cloudXAd: CloudXAd)"
-      - "onAdClicked(cloudXAd: CloudXAd)"
-      - "onAdHidden(cloudXAd: CloudXAd)"
-      - "onAdDisplayFailed(cloudXError: CloudXError)"
-      - "onUserRewarded(cloudXAd: CloudXAd)"
+    rewarded:
+      factory: "CloudX.createRewardedInterstitial(placementName: String): CloudXRewardedInterstitialAd"
+      listener: "CloudXRewardedInterstitialListener"
+      load_required: true
+      ready_check: "isAdReady: Boolean"
+      show_method: "show()"
+      callbacks:
+        - "onAdLoaded(cloudXAd: CloudXAd)"
+        - "onAdLoadFailed(cloudXError: CloudXError)"
+        - "onAdDisplayed(cloudXAd: CloudXAd)"
+        - "onAdClicked(cloudXAd: CloudXAd)"
+        - "onAdHidden(cloudXAd: CloudXAd)"
+        - "onAdDisplayFailed(cloudXError: CloudXError)"
+        - "onUserRewarded(cloudXAd: CloudXAd)"
 
-  privacy:
-    class: "CloudXPrivacy"
-    constructor: "CloudXPrivacy(isUserConsent: Boolean?, isAgeRestrictedUser: Boolean?)"
-    setter: "CloudX.setPrivacy(privacy: CloudXPrivacy)"
+    privacy:
+      class: "CloudXPrivacy"
+      constructor: "CloudXPrivacy(isUserConsent: Boolean?, isAgeRestrictedUser: Boolean?)"
+      setter: "CloudX.setPrivacy(privacy: CloudXPrivacy)"
+
+  flutter:
+    initialization:
+      method: "CloudX.initialize({required String appKey, bool allowIosExperimental}): Future<bool>"
+      async: true
+
+    banner:
+      widget: "CloudXBannerView(placementName: String, listener: CloudXAdViewListener?)"
+      factory: "CloudX.createBanner({required String placementName, String? adId, CloudXAdViewListener? listener, AdViewPosition? position}): Future<String?>"
+      load_method: "CloudX.loadBanner({required String adId}): Future<bool>"
+      show_method: "CloudX.showBanner({required String adId}): Future<bool>"
+      destroy_required: true
+      listener: "CloudXAdViewListener"
+      callbacks:
+        - "onAdLoaded(CloudXAd ad)"
+        - "onAdLoadFailed(String error)"
+        - "onAdDisplayed(CloudXAd ad)"
+        - "onAdClicked(CloudXAd ad)"
+        - "onAdHidden(CloudXAd ad)"
+        - "onAdDisplayFailed(String error)"
+        - "onAdExpanded(CloudXAd ad)"
+        - "onAdCollapsed(CloudXAd ad)"
+
+    mrec:
+      widget: "CloudXMRECView(placementName: String, listener: CloudXAdViewListener?)"
+      factory: "CloudX.createMREC({required String placementName, String? adId, CloudXAdViewListener? listener, AdViewPosition? position}): Future<String?>"
+      load_method: "CloudX.loadMREC({required String adId}): Future<bool>"
+      show_method: "CloudX.showMREC({required String adId}): Future<bool>"
+      ready_check: "CloudX.isMRECReady({required String adId}): Future<bool>"
+      destroy_required: true
+
+    interstitial:
+      factory: "CloudX.createInterstitial({required String placementName, String? adId, CloudXInterstitialListener? listener}): Future<String?>"
+      load_method: "CloudX.loadInterstitial({required String adId}): Future<bool>"
+      show_method: "CloudX.showInterstitial({required String adId}): Future<bool>"
+      ready_check: "CloudX.isInterstitialReady({required String adId}): Future<bool>"
+      destroy_required: true
+      listener: "CloudXInterstitialListener"
+      callbacks:
+        - "onAdLoaded(CloudXAd ad)"
+        - "onAdLoadFailed(String error)"
+        - "onAdDisplayed(CloudXAd ad)"
+        - "onAdClicked(CloudXAd ad)"
+        - "onAdHidden(CloudXAd ad)"
+        - "onAdDisplayFailed(String error)"
+
+    privacy:
+      ccpa: "CloudX.setCCPAPrivacyString(String? ccpaString): Future<void>"
+      gpp: "CloudX.setGPPString(String? gppString): Future<void>"
+      gpp_sid: "CloudX.setGPPSid(List<int>? sectionIds): Future<void>"
+      coppa: "CloudX.setIsAgeRestrictedUser(bool isAgeRestricted): Future<void>"
+      gdpr: "CloudX.setIsUserConsent(bool hasConsent): Future<void>  # NOT YET SUPPORTED by servers"
+
+    lifecycle:
+      destroy: "CloudX.destroyAd({required String adId}): Future<bool>"
+      auto_refresh_start: "CloudX.startAutoRefresh({required String adId}): Future<bool>"
+      auto_refresh_stop: "CloudX.stopAutoRefresh({required String adId}): Future<bool>"
 
 # Files that contain API references (must be updated when SDK changes)
 agent_files:
-  - path: ".claude/agents/cloudx-android-integrator.md"
-    api_references:
-      - "CloudXInitializationParams"
-      - "CloudXInitializationListener"
-      - "CloudX.createBanner"
-      - "CloudX.createInterstitial"
-      - "CloudX.createRewardedInterstitial"
-      - "CloudXAdViewListener"
-      - "CloudXInterstitialListener"
-      - "CloudXRewardedInterstitialListener"
-      - "isAdReady"
-      - "show()"
-      - "load()"
+  android:
+    - path: ".claude/agents/android/cloudx-android-integrator.md"
+      api_references:
+        - "CloudXInitializationParams"
+        - "CloudXInitializationListener"
+        - "CloudX.createBanner"
+        - "CloudX.createInterstitial"
+        - "CloudX.createRewardedInterstitial"
+        - "CloudXAdViewListener"
+        - "CloudXInterstitialListener"
+        - "CloudXRewardedInterstitialListener"
+        - "isAdReady"
+        - "show()"
+        - "load()"
 
-  - path: ".claude/agents/cloudx-android-auditor.md"
-    api_references:
-      - "onAdLoadFailed"
-      - "CloudXError"
-      - "isAdReady"
+    - path: ".claude/agents/android/cloudx-android-auditor.md"
+      api_references:
+        - "onAdLoadFailed"
+        - "CloudXError"
+        - "isAdReady"
 
-  - path: ".claude/agents/cloudx-android-build-verifier.md"
-    api_references:
-      - "Gradle build validation"  # Validates SDK integration
+    - path: ".claude/agents/android/cloudx-android-build-verifier.md"
+      api_references:
+        - "Gradle build validation"
 
-  - path: ".claude/agents/cloudx-android-privacy-checker.md"
-    api_references:
-      - "CloudXPrivacy"
-      - "isUserConsent"
-      - "isAgeRestrictedUser"
-      - "CloudX.setPrivacy"
+    - path: ".claude/agents/android/cloudx-android-privacy-checker.md"
+      api_references:
+        - "CloudXPrivacy"
+        - "isUserConsent"
+        - "isAgeRestrictedUser"
+        - "CloudX.setPrivacy"
 
-  - path: "docs/INTEGRATION_GUIDE.md"
-    api_references:
-      - "ALL"  # Comprehensive guide, references all APIs
+    - path: "docs/android/INTEGRATION_GUIDE.md"
+      api_references:
+        - "ALL"
 
-  - path: "docs/ORCHESTRATION.md"
-    api_references:
-      - "ALL"  # Multi-agent orchestration guide
+    - path: "docs/android/ORCHESTRATION.md"
+      api_references:
+        - "ALL"
+
+  flutter:
+    - path: ".claude/agents/flutter/cloudx-flutter-integrator.md"
+      api_references:
+        - "CloudX.initialize"
+        - "CloudXBannerView"
+        - "CloudXMRECView"
+        - "CloudX.createBanner"
+        - "CloudX.createInterstitial"
+        - "CloudX.createMREC"
+        - "CloudXAdViewListener"
+        - "CloudXInterstitialListener"
+        - "CloudX.loadBanner"
+        - "CloudX.loadInterstitial"
+        - "CloudX.showInterstitial"
+        - "CloudX.isInterstitialReady"
+        - "CloudX.destroyAd"
+
+    - path: ".claude/agents/flutter/cloudx-flutter-auditor.md"
+      api_references:
+        - "onAdLoadFailed"
+        - "CloudX.destroyAd"
+        - "CloudX.stopAutoRefresh"
+
+    - path: ".claude/agents/flutter/cloudx-flutter-build-verifier.md"
+      api_references:
+        - "Flutter build validation"
+
+    - path: ".claude/agents/flutter/cloudx-flutter-privacy-checker.md"
+      api_references:
+        - "CloudX.setCCPAPrivacyString"
+        - "CloudX.setGPPString"
+        - "CloudX.setGPPSid"
+        - "CloudX.setIsAgeRestrictedUser"
+        - "CloudX.setIsUserConsent"
+
+    - path: "docs/flutter/INTEGRATION_GUIDE.md"
+      api_references:
+        - "ALL"
+
+    - path: "docs/flutter/ORCHESTRATION.md"
+      api_references:
+        - "ALL"
 
 # Update checklist (what to do when SDK version changes)
 update_checklist:
-  - "Update sdk_version field above"
-  - "Run ./scripts/validate_agent_apis.sh"
-  - "Review git diff for public API changes"
-  - "Update agent files with new API names"
-  - "Update code examples in docs/INTEGRATION_GUIDE.md"
-  - "Run agent validation tests"
-  - "Update agents_last_updated date"
-  - "Commit with message: 'Update agents for SDK vX.X.X'"
+  android:
+    - "Update platforms.android.sdk_version field above"
+    - "Run ./scripts/android/validate_agent_apis.sh"
+    - "Review git diff for public API changes"
+    - "Update agent files with new API names"
+    - "Update code examples in docs/android/INTEGRATION_GUIDE.md"
+    - "Run agent validation tests"
+    - "Update platforms.android.agents_last_updated date"
+    - "Commit with message: 'Update Android agents for SDK vX.X.X'"
+
+  flutter:
+    - "Update platforms.flutter.sdk_version field above"
+    - "Run ./scripts/flutter/validate_agent_apis.sh"
+    - "Review git diff for public API changes"
+    - "Update agent files with new API names"
+    - "Update code examples in docs/flutter/INTEGRATION_GUIDE.md"
+    - "Run agent validation tests"
+    - "Update platforms.flutter.agents_last_updated date"
+    - "Commit with message: 'Update Flutter agents for SDK vX.X.X'"
 
 # Known breaking changes to watch for
 breaking_change_patterns:

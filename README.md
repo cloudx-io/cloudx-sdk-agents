@@ -1,28 +1,105 @@
-# CloudX Android SDK - Claude Code Agents
+# CloudX SDK - Claude Code Agents (Multi-Platform)
 
-Automated CloudX SDK integration in 20 minutes with AI-powered agents.
+Automated CloudX SDK integration in ~20 minutes with AI-powered agents.
+
+Reduce integration time from 4-6 hours to 20 minutes with specialized AI agents that handle boilerplate code, implement fallback logic, and validate compliance.
+
+## Supported Platforms
+
+| Platform | Status | SDK Version | Agents |
+|----------|--------|-------------|--------|
+| **Android** | ✅ Production | v0.5.0 | 4 agents |
+| **Flutter** | ✅ Production | v0.1.2 | 4 agents |
+| **iOS** | 🚧 Coming Soon | TBD | TBD |
 
 ## Quick Start
 
+### Install All Agents
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/cloudx-io/cloudx-sdk-agents/main/scripts/install.sh)
-cd your-android-project
-claude
-"@agent-cloudx-android-integrator to integrate CloudX SDK with app key: YOUR_KEY"
 ```
 
-## Agents
+### Install Platform-Specific Agents
+```bash
+# Android only
+bash scripts/install.sh --platform=android
 
-- **cloudx-android-integrator** - Implements CloudX with fallback
-- **cloudx-android-auditor** - Validates fallback paths
-- **cloudx-android-build-verifier** - Runs builds and tests
-- **cloudx-android-privacy-checker** - Validates privacy compliance
+# Flutter only
+bash scripts/install.sh --platform=flutter
+```
+
+### Use Agents
+
+**Android:**
+```bash
+cd your-android-project
+claude
+"Use cloudx-android-integrator to integrate CloudX SDK with app key: YOUR_KEY"
+```
+
+**Flutter:**
+```bash
+cd your-flutter-project
+claude
+"Use cloudx-flutter-integrator to integrate CloudX SDK with app key: YOUR_KEY"
+```
+
+## Agents by Platform
+
+### Android Agents
+- **cloudx-android-integrator** - Implements CloudX with AdMob/AppLovin fallback
+- **cloudx-android-auditor** - Validates fallback paths remain intact
+- **cloudx-android-build-verifier** - Runs Gradle builds and catches errors
+- **cloudx-android-privacy-checker** - Validates GDPR/CCPA/COPPA compliance
+
+[📖 Android Documentation](./docs/android/)
+
+### Flutter Agents
+- **cloudx-flutter-integrator** - Implements CloudX with AdMob/AppLovin fallback
+- **cloudx-flutter-auditor** - Validates fallback paths remain intact
+- **cloudx-flutter-build-verifier** - Runs Flutter builds and catches errors
+- **cloudx-flutter-privacy-checker** - Validates GDPR/CCPA/COPPA compliance
+
+[📖 Flutter Documentation](./docs/flutter/)
 
 ## Documentation
 
-- [Setup Guide](./docs/SETUP.md)
-- [Integration Guide](./docs/INTEGRATION_GUIDE.md)
-- [Orchestration](./docs/ORCHESTRATION.md)
+### Android
+- [Setup Guide](./docs/android/SETUP.md)
+- [Integration Guide](./docs/android/INTEGRATION_GUIDE.md)
+- [Orchestration](./docs/android/ORCHESTRATION.md)
 
-**SDK:** https://github.com/cloudx-io/cloudexchange.android.sdk
-**Issues:** https://github.com/cloudx-io/cloudx-sdk-agents/issues
+### Flutter
+- [Setup Guide](./docs/flutter/SETUP.md)
+- [Integration Guide](./docs/flutter/INTEGRATION_GUIDE.md)
+- [Orchestration](./docs/flutter/ORCHESTRATION.md)
+
+### General
+- [Guide for Implementing Agents for Other SDKs](./GUIDE_FOR_OTHER_SDKS.md)
+
+## Resources
+
+- **Android SDK:** https://github.com/cloudx-io/cloudexchange.android.sdk
+- **Flutter SDK:** https://github.com/cloudx-io/cloudx-flutter
+- **Issues:** https://github.com/cloudx-io/cloudx-sdk-agents/issues
+
+## Key Features
+
+- ✅ **Fast Integration** - 20 minutes vs. 4-6 hours manual
+- ✅ **Fallback Logic** - Automatic fallback to AdMob/AppLovin
+- ✅ **Privacy Compliance** - GDPR, CCPA, COPPA validation
+- ✅ **Build Verification** - Catches errors before runtime
+- ✅ **Best Practices** - Implements recommended patterns automatically
+
+## How It Works
+
+1. **Install agents** - One-line installer for your platform
+2. **Invoke integrator** - AI agent implements SDK with fallback
+3. **Validate** - Auditor checks fallback paths are intact
+4. **Build** - Build verifier catches compilation errors
+5. **Check privacy** - Privacy checker validates compliance
+6. **Ship** - Production-ready integration in ~20 minutes
+
+## Contributing
+
+See [GUIDE_FOR_OTHER_SDKS.md](./GUIDE_FOR_OTHER_SDKS.md) for implementing agents for iOS, Unity, React Native, or other platforms.
