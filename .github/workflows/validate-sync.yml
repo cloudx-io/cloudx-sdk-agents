@@ -3,23 +3,102 @@ name: Validate Agent Sync
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
 
 jobs:
-  validate:
+  validate-android:
+    name: Validate Android Agents
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate agent APIs
-        run: bash scripts/validate_agent_apis.sh
+      - name: Validate Android agent APIs
+        run: bash scripts/android/validate_agent_apis.sh
 
-      - name: Check SDK version
-        run: grep -q "sdk_version:" SDK_VERSION.yaml
+      - name: Check Android SDK version
+        run: |
+          grep -q "android:" SDK_VERSION.yaml
+          grep -q "sdk_version:" SDK_VERSION.yaml
+
+  validate-flutter:
+    name: Validate Flutter Agents
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.0.0'
+          channel: 'stable'
+
+      - name: Validate Flutter agent APIs
+        run: bash scripts/flutter/validate_agent_apis.sh
+
+      - name: Check Flutter SDK version
+        run: |
+          grep -q "flutter:" SDK_VERSION.yaml
+          grep -q "flutter_sdk_min:" SDK_VERSION.yaml
+
+  validate-structure:
+    name: Validate Repository Structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check agent files exist
+        run: |
+          # Android agents
+          test -f .claude/agents/android/cloudx-android-integrator.md
+          test -f .claude/agents/android/cloudx-android-auditor.md
+          test -f .claude/agents/android/cloudx-android-build-verifier.md
+          test -f .claude/agents/android/cloudx-android-privacy-checker.md
+
+          # Flutter agents
+          test -f .claude/agents/flutter/cloudx-flutter-integrator.md
+          test -f .claude/agents/flutter/cloudx-flutter-auditor.md
+          test -f .claude/agents/flutter/cloudx-flutter-build-verifier.md
+          test -f .claude/agents/flutter/cloudx-flutter-privacy-checker.md
+
+      - name: Check documentation exists
+        run: |
+          # Android docs
+          test -f docs/android/SETUP.md
+          test -f docs/android/INTEGRATION_GUIDE.md
+          test -f docs/android/ORCHESTRATION.md
+
+          # Flutter docs
+          test -f docs/flutter/SETUP.md
+          test -f docs/flutter/INTEGRATION_GUIDE.md
+          test -f docs/flutter/ORCHESTRATION.md
+
+      - name: Check validation scripts exist
+        run: |
+          test -f scripts/android/validate_agent_apis.sh
+          test -f scripts/flutter/validate_agent_apis.sh
+          test -x scripts/android/validate_agent_apis.sh
+          test -x scripts/flutter/validate_agent_apis.sh
+
+      - name: Validate SDK_VERSION.yaml structure
+        run: |
+          grep -q "platforms:" SDK_VERSION.yaml
+          grep -q "android:" SDK_VERSION.yaml
+          grep -q "flutter:" SDK_VERSION.yaml
 
       # Future: Add example project testing when available
-      # - name: Test examples
+      # - name: Test Android examples
       #   run: |
-      #     if [ -d "examples/basic-integration" ]; then
-      #       cd examples/basic-integration
+      #     if [ -d "examples/android/basic-integration" ]; then
+      #       cd examples/android/basic-integration
       #       ./gradlew build
+      #     fi
+      #
+      # - name: Test Flutter examples
+      #   run: |
+      #     if [ -d "examples/flutter/basic-integration" ]; then
+      #       cd examples/flutter/basic-integration
+      #       flutter pub get
+      #       flutter analyze
+      #       flutter build apk --debug
       #     fi
