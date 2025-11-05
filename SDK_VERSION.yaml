@@ -6,7 +6,7 @@ platforms:
   android:
     sdk_version: "0.5.0"
     agents_last_updated: "2025-11-03"
-    verified_against_commit: "3b82ced"  # Fixed agent documentation API references
+    verified_against_commit: "b2ae1ac"  # Added test mode parameter to initialization
 
   flutter:
     sdk_version: "0.1.2"
@@ -20,7 +20,7 @@ api_signatures:
   android:
     initialization:
       class: "CloudXInitializationParams"
-      constructor: "CloudXInitializationParams(appKey: String)"
+      constructor: "CloudXInitializationParams(appKey: String, testMode: Boolean = false)"
       listener: "CloudXInitializationListener"
       callbacks:
         - "onInitialized()"

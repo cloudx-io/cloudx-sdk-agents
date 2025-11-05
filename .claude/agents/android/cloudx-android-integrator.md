@@ -34,6 +34,22 @@ CloudX.initialize(
 )
 ```
 
+**Test Mode (Development Only):**
+```kotlin
+// Enable test mode for development and testing
+CloudX.initialize(
+    initParams = CloudXInitializationParams(
+        appKey = "YOUR_APP_KEY",
+        testMode = true  // Requests test ads
+    ),
+    listener = object : CloudXInitializationListener {
+        override fun onInitialized() {}
+        override fun onInitializationFailed(cloudXError: CloudXError) {}
+    }
+)
+```
+> **Note:** Set `testMode = false` (or omit it) in production builds. Test mode requests test ads suitable for development and testing.
+
 **Banner:**
 ```kotlin
 val banner = CloudX.createBanner(placementName = "banner_home")
