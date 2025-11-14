@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # CloudX SDK - Multi-Platform Agent Installer
-# Installs CloudX integration agents for Claude Code (Android + Flutter)
-# Usage: bash install.sh [--global|--local] [--platform=android|flutter|all]
+# Installs CloudX integration agents for Claude Code (Android + Flutter + iOS)
+# Usage: bash install.sh [--global|--local] [--platform=android|flutter|ios|all]
 
 set -e
 
@@ -46,12 +46,12 @@ BASE_URL="https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}
 
 # Validate platform argument
 case $PLATFORM in
-    android|flutter|all)
+    android|flutter|ios|all)
         ;;
     *)
         echo -e "${RED}Error: Invalid platform '${PLATFORM}'${NC}"
-        echo "Valid options: android, flutter, all"
-        echo "Usage: bash install.sh [--global|--local] [--platform=android|flutter|all]"
+        echo "Valid options: android, flutter, ios, all"
+        echo "Usage: bash install.sh [--global|--local] [--platform=android|flutter|ios|all]"
         exit 1
         ;;
 esac
@@ -72,6 +72,14 @@ FLUTTER_AGENTS=(
     "cloudx-flutter-privacy-checker"
 )
 
+# iOS agent files
+IOS_AGENTS=(
+    "cloudx-ios-integrator"
+    "cloudx-ios-auditor"
+    "cloudx-ios-build-verifier"
+    "cloudx-ios-privacy-checker"
+)
+
 # Helper functions
 print_header() {
     echo ""
@@ -86,8 +94,11 @@ print_header() {
         flutter)
             echo -e "  Platform: ${GREEN}Flutter${NC}"
             ;;
+        ios)
+            echo -e "  Platform: ${GREEN}iOS${NC}"
+            ;;
         all)
-            echo -e "  Platform: ${GREEN}All (Android + Flutter)${NC}"
+            echo -e "  Platform: ${GREEN}All (Android + Flutter + iOS)${NC}"
             ;;
     esac
     echo ""
@@ -197,14 +208,22 @@ install_global() {
             total_success=$?
             total_agents=${#FLUTTER_AGENTS[@]}
             ;;
+        ios)
+            install_platform_agents "$agent_dir" "ios" "${IOS_AGENTS[@]}"
+            total_success=$?
+            total_agents=${#IOS_AGENTS[@]}
+            ;;
         all)
             install_platform_agents "$agent_dir" "android" "${ANDROID_AGENTS[@]}"
             local android_success=$?
             echo ""
             install_platform_agents "$agent_dir" "flutter" "${FLUTTER_AGENTS[@]}"
             local flutter_success=$?
-            total_agents=$((${#ANDROID_AGENTS[@]} + ${#FLUTTER_AGENTS[@]}))
-            if [ $android_success -eq 0 ] && [ $flutter_success -eq 0 ]; then
+            echo ""
+            install_platform_agents "$agent_dir" "ios" "${IOS_AGENTS[@]}"
+            local ios_success=$?
+            total_agents=$((${#ANDROID_AGENTS[@]} + ${#FLUTTER_AGENTS[@]} + ${#IOS_AGENTS[@]}))
+            if [ $android_success -eq 0 ] && [ $flutter_success -eq 0 ] && [ $ios_success -eq 0 ]; then
                 total_success=0
             else
                 total_success=1
@@ -236,13 +255,20 @@ install_local() {
             install_platform_agents "$agent_dir" "flutter" "${FLUTTER_AGENTS[@]}"
             total_success=$?
             ;;
+        ios)
+            install_platform_agents "$agent_dir" "ios" "${IOS_AGENTS[@]}"
+            total_success=$?
+            ;;
         all)
             install_platform_agents "$agent_dir" "android" "${ANDROID_AGENTS[@]}"
             local android_success=$?
             echo ""
             install_platform_agents "$agent_dir" "flutter" "${FLUTTER_AGENTS[@]}"
             local flutter_success=$?
-            if [ $android_success -eq 0 ] && [ $flutter_success -eq 0 ]; then
+            echo ""
+            install_platform_agents "$agent_dir" "ios" "${IOS_AGENTS[@]}"
+            local ios_success=$?
+            if [ $android_success -eq 0 ] && [ $flutter_success -eq 0 ] && [ $ios_success -eq 0 ]; then
                 total_success=0
             else
                 total_success=1
@@ -281,9 +307,17 @@ verify_installation() {
                 fi
             done
             ;;
+        ios)
+            total_expected=${#IOS_AGENTS[@]}
+            for agent in "${IOS_AGENTS[@]}"; do
+                if [ -f "${agent_dir}/${agent}.md" ]; then
+                    ((found_count++))
+                fi
+            done
+            ;;
         all)
-            total_expected=$((${#ANDROID_AGENTS[@]} + ${#FLUTTER_AGENTS[@]}))
-            for agent in "${ANDROID_AGENTS[@]}" "${FLUTTER_AGENTS[@]}"; do
+            total_expected=$((${#ANDROID_AGENTS[@]} + ${#FLUTTER_AGENTS[@]} + ${#IOS_AGENTS[@]}))
+            for agent in "${ANDROID_AGENTS[@]}" "${FLUTTER_AGENTS[@]}" "${IOS_AGENTS[@]}"; do
                 if [ -f "${agent_dir}/${agent}.md" ]; then
                     ((found_count++))
                 fi
@@ -307,7 +341,7 @@ show_usage() {
     echo "Options:"
     echo "  --local               Install agents to current project's .claude/agents/ (default)"
     echo "  --global              Install agents globally to ~/.claude/agents/"
-    echo "  --platform=PLATFORM   Choose platform: android, flutter, or all (default: all)"
+    echo "  --platform=PLATFORM   Choose platform: android, flutter, ios, or all (default: all)"
     echo "  --branch=BRANCH       Install from specific branch (default: main)"
     echo "  --help                Show this help message"
     echo ""
@@ -317,7 +351,8 @@ show_usage() {
     echo "  bash install.sh --global                  # Install all platforms globally"
     echo "  bash install.sh --platform=android        # Install only Android agents locally"
     echo "  bash install.sh --platform=flutter        # Install only Flutter agents locally"
-    echo "  bash install.sh --global --platform=flutter  # Install Flutter agents globally"
+    echo "  bash install.sh --platform=ios            # Install only iOS agents locally"
+    echo "  bash install.sh --global --platform=ios   # Install iOS agents globally"
 }
 
 # Show next steps
@@ -342,6 +377,11 @@ show_next_steps() {
                 echo "   • ${agent}"
             done
             ;;
+        ios)
+            for agent in "${IOS_AGENTS[@]}"; do
+                echo "   • ${agent}"
+            done
+            ;;
         all)
             echo "   Android:"
             for agent in "${ANDROID_AGENTS[@]}"; do
@@ -349,6 +389,10 @@ show_next_steps() {
             done
             echo "   Flutter:"
             for agent in "${FLUTTER_AGENTS[@]}"; do
+                echo "     • ${agent}"
+            done
+            echo "   iOS:"
+            for agent in "${IOS_AGENTS[@]}"; do
                 echo "     • ${agent}"
             done
             ;;
@@ -372,6 +416,10 @@ show_next_steps() {
                 echo "1. Navigate to your Flutter project:"
                 echo -e "   ${BLUE}cd /path/to/your/flutter/project${NC}"
                 ;;
+            ios)
+                echo "1. Navigate to your iOS project:"
+                echo -e "   ${BLUE}cd /path/to/your/ios/project${NC}"
+                ;;
             all)
                 echo "1. Navigate to your project:"
                 echo -e "   ${BLUE}cd /path/to/your/project${NC}"
@@ -391,9 +439,13 @@ show_next_steps() {
         flutter)
             echo -e "   ${YELLOW}Use @agent-cloudx-flutter-integrator to integrate CloudX SDK with app key: YOUR_KEY${NC}"
             ;;
+        ios)
+            echo -e "   ${YELLOW}Use @agent-cloudx-ios-integrator to integrate CloudX SDK with app key: YOUR_KEY${NC}"
+            ;;
         all)
             echo -e "   Android: ${YELLOW}Use @agent-cloudx-android-integrator to integrate CloudX SDK${NC}"
             echo -e "   Flutter: ${YELLOW}Use @agent-cloudx-flutter-integrator to integrate CloudX SDK${NC}"
+            echo -e "   iOS: ${YELLOW}Use @agent-cloudx-ios-integrator to integrate CloudX SDK${NC}"
             ;;
     esac
 
@@ -415,9 +467,14 @@ show_next_steps() {
             echo "   • Setup Guide: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/docs/flutter/SETUP.md"
             echo "   • Integration Guide: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/docs/flutter/INTEGRATION_GUIDE.md"
             ;;
+        ios)
+            echo "   • Setup Guide: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/docs/ios/SETUP.md"
+            echo "   • Integration Guide: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/docs/ios/INTEGRATION_GUIDE.md"
+            ;;
         all)
             echo "   • Android: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/docs/android/"
             echo "   • Flutter: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/docs/flutter/"
+            echo "   • iOS: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/docs/ios/"
             ;;
     esac
     echo "   • Agent Reference: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/README.md"
