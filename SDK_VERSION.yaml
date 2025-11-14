@@ -15,6 +15,12 @@ platforms:
     agents_last_updated: "2025-11-04"
     verified_against_commit: "TBD"  # Initial Flutter agent implementation
 
+  ios:
+    sdk_version: "1.2.0"
+    ios_deployment_target: "14.0"
+    agents_last_updated: "2025-11-14"
+    verified_against_commit: "TBD"  # Initial iOS agent implementation
+
 # Critical API signatures that agents depend on (Platform-specific)
 api_signatures:
   android:
@@ -131,6 +137,93 @@ api_signatures:
       auto_refresh_start: "CloudX.startAutoRefresh({required String adId}): Future<bool>"
       auto_refresh_stop: "CloudX.stopAutoRefresh({required String adId}): Future<bool>"
 
+  ios:
+    initialization:
+      class: "CloudXCore"
+      method_objc: "- (void)initializeSDKWithAppKey:(NSString *)appKey completion:(nullable void (^)(BOOL success, NSError * _Nullable error))completion"
+      method_swift: "CloudXCore.shared.initializeSDK(appKey: String, completion: @escaping (Bool, Error?) -> Void)"
+      singleton: "[CloudXCore shared]"  # Objective-C
+      singleton_swift: "CloudXCore.shared"
+
+    banner:
+      factory_objc: "- (nullable CLXBannerAdView *)createBannerWithPlacement:(NSString *)placement viewController:(UIViewController *)viewController delegate:(nullable id<CLXBannerDelegate>)delegate tmax:(nullable NSNumber *)tmax"
+      factory_swift: "createBanner(placement: String, viewController: UIViewController, delegate: CLXBannerDelegate?, tmax: NSNumber?) -> CLXBannerAdView?"
+      delegate: "CLXBannerDelegate"
+      auto_load: true
+      view_controller_required: true
+      callbacks:
+        - "bannerDidLoad:(_:CLXBannerAdView)"
+        - "bannerDidFailToLoad:(_:CLXBannerAdView, withError:Error)"
+        - "bannerWasClicked:(_:CLXBannerAdView)"
+        - "bannerDidPresentScreen:(_:CLXBannerAdView)"
+        - "bannerDidDismissScreen:(_:CLXBannerAdView)"
+
+    mrec:
+      factory_objc: "- (nullable CLXMRECAdView *)createMRECWithPlacement:(NSString *)placement viewController:(UIViewController *)viewController delegate:(nullable id<CLXMRECDelegate>)delegate tmax:(nullable NSNumber *)tmax"
+      factory_swift: "createMREC(placement: String, viewController: UIViewController, delegate: CLXMRECDelegate?, tmax: NSNumber?) -> CLXMRECAdView?"
+      delegate: "CLXMRECDelegate"
+      auto_load: true
+      view_controller_required: true
+
+    interstitial:
+      factory_objc: "- (nullable CLXInterstitial *)createInterstitialWithPlacement:(NSString *)placement delegate:(nullable id<CLXInterstitialDelegate>)delegate tmax:(nullable NSNumber *)tmax"
+      factory_swift: "createInterstitial(placement: String, delegate: CLXInterstitialDelegate?, tmax: NSNumber?) -> CLXInterstitial?"
+      delegate: "CLXInterstitialDelegate"
+      auto_load: true
+      show_method_objc: "- (void)showFromViewController:(UIViewController *)viewController"
+      show_method_swift: "show(from: UIViewController)"
+      callbacks:
+        - "interstitialDidLoad:(_:CLXInterstitial)"
+        - "interstitialDidFailToLoad:(_:CLXInterstitial, withError:Error)"
+        - "interstitialDidDisplay:(_:CLXInterstitial)"
+        - "interstitialWasClicked:(_:CLXInterstitial)"
+        - "interstitialDidDismiss:(_:CLXInterstitial)"
+        - "interstitialDidFailToDisplay:(_:CLXInterstitial, withError:Error)"
+
+    rewarded:
+      factory_objc: "- (nullable CLXRewardedAd *)createRewardedWithPlacement:(NSString *)placement delegate:(nullable id<CLXRewardedDelegate>)delegate tmax:(nullable NSNumber *)tmax"
+      factory_swift: "createRewarded(placement: String, delegate: CLXRewardedDelegate?, tmax: NSNumber?) -> CLXRewardedAd?"
+      delegate: "CLXRewardedDelegate"
+      auto_load: true
+      show_method_objc: "- (void)showFromViewController:(UIViewController *)viewController"
+      show_method_swift: "show(from: UIViewController)"
+      callbacks:
+        - "rewardedDidLoad:(_:CLXRewardedAd)"
+        - "rewardedDidFailToLoad:(_:CLXRewardedAd, withError:Error)"
+        - "rewardedDidDisplay:(_:CLXRewardedAd)"
+        - "rewardedWasClicked:(_:CLXRewardedAd)"
+        - "rewardedDidDismiss:(_:CLXRewardedAd)"
+        - "rewardedDidFailToDisplay:(_:CLXRewardedAd, withError:Error)"
+        - "rewardedUserDidEarnReward:(_:CLXRewardedAd)"
+
+    native:
+      factory_objc: "- (nullable CLXNativeAd *)createNativeWithPlacement:(NSString *)placement viewController:(UIViewController *)viewController delegate:(nullable id<CLXNativeDelegate>)delegate tmax:(nullable NSNumber *)tmax"
+      factory_swift: "createNative(placement: String, viewController: UIViewController, delegate: CLXNativeDelegate?, tmax: NSNumber?) -> CLXNativeAd?"
+      delegate: "CLXNativeDelegate"
+      auto_load: true
+      view_controller_required: true
+
+    privacy:
+      ccpa_objc: "+ (void)setCCPAPrivacyString:(nullable NSString *)ccpaPrivacyString"
+      ccpa_swift: "CloudXCore.setCCPAPrivacyString(_:String?)"
+      gdpr_objc: "+ (void)setIsUserConsent:(BOOL)isUserConsent"
+      gdpr_swift: "CloudXCore.setIsUserConsent(_:Bool)"
+      coppa_objc: "+ (void)setIsAgeRestrictedUser:(BOOL)isAgeRestricted"
+      coppa_swift: "CloudXCore.setIsAgeRestrictedUser(_:Bool)"
+      note: "Privacy methods are class methods (+ prefix in ObjC, static in Swift concept)"
+
+    ios_specific:
+      packaging:
+        cocoapods: "pod 'CloudXCore', '~> 1.2.0'"
+        spm: ".package(url: \"https://github.com/cloudx-io/cloudx-ios\", from: \"1.2.0\")"
+      key_differences_from_android:
+        - "iOS ads auto-load (no explicit .load() call needed)"
+        - "iOS requires UIViewController for banner/MREC/native ad creation"
+        - "iOS delegates are protocols (not interfaces like Android)"
+        - "iOS privacy methods are class methods (+ prefix)"
+        - "iOS fullscreen ads use showFromViewController: method"
+        - "iOS uses completion callbacks (^) for async operations"
+
 # Files that contain API references (must be updated when SDK changes)
 agent_files:
   android:
@@ -216,6 +309,59 @@ agent_files:
       api_references:
         - "ALL"
 
+  ios:
+    - path: ".claude/agents/ios/cloudx-ios-integrator.md"
+      api_references:
+        - "CloudXCore"
+        - "initializeSDKWithAppKey:completion:"
+        - "createBannerWithPlacement:viewController:delegate:tmax:"
+        - "createInterstitialWithPlacement:delegate:tmax:"
+        - "createRewardedWithPlacement:delegate:tmax:"
+        - "createMRECWithPlacement:viewController:delegate:tmax:"
+        - "createNativeWithPlacement:viewController:delegate:tmax:"
+        - "CLXBannerDelegate"
+        - "CLXInterstitialDelegate"
+        - "CLXRewardedDelegate"
+        - "CLXMRECDelegate"
+        - "CLXNativeDelegate"
+        - "showFromViewController:"
+        - "setCCPAPrivacyString:"
+        - "setIsUserConsent:"
+        - "setIsAgeRestrictedUser:"
+
+    - path: ".claude/agents/ios/cloudx-ios-auditor.md"
+      api_references:
+        - "bannerDidFailToLoad:withError:"
+        - "interstitialDidFailToLoad:withError:"
+        - "rewardedDidFailToLoad:withError:"
+        - "initializeSDKWithAppKey:completion:"
+
+    - path: ".claude/agents/ios/cloudx-ios-build-verifier.md"
+      api_references:
+        - "Xcode build validation"
+        - "CocoaPods validation"
+        - "SPM validation"
+
+    - path: ".claude/agents/ios/cloudx-ios-privacy-checker.md"
+      api_references:
+        - "setCCPAPrivacyString:"
+        - "setIsUserConsent:"
+        - "setIsAgeRestrictedUser:"
+        - "NSUserTrackingUsageDescription"
+        - "requestTrackingAuthorization"
+
+    - path: "docs/ios/SETUP.md"
+      api_references:
+        - "ALL"
+
+    - path: "docs/ios/INTEGRATION_GUIDE.md"
+      api_references:
+        - "ALL"
+
+    - path: "docs/ios/ORCHESTRATION.md"
+      api_references:
+        - "ALL"
+
 # Update checklist (what to do when SDK version changes)
 update_checklist:
   android:
@@ -237,6 +383,17 @@ update_checklist:
     - "Run agent validation tests"
     - "Update platforms.flutter.agents_last_updated date"
     - "Commit with message: 'Update Flutter agents for SDK vX.X.X'"
+
+  ios:
+    - "Update platforms.ios.sdk_version field above"
+    - "Run ./scripts/ios/validate_agent_apis.sh"
+    - "Review git diff for public API changes (CloudXCoreAPI.h)"
+    - "Update agent files with new API names (both Objective-C and Swift)"
+    - "Update code examples in docs/ios/INTEGRATION_GUIDE.md"
+    - "Verify both Objective-C and Swift examples compile"
+    - "Run agent validation tests"
+    - "Update platforms.ios.agents_last_updated date"
+    - "Commit with message: 'Update iOS agents for SDK vX.X.X'"
 
 # Known breaking changes to watch for
 breaking_change_patterns:
