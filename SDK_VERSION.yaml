@@ -4,9 +4,9 @@
 # Platform-specific SDK versions
 platforms:
   android:
-    sdk_version: "0.6.1"
-    agents_last_updated: "2025-11-10"
-    verified_against_commit: "ea8cffb"  # Add BuildInfoProvider abstraction and improve test coverage
+    sdk_version: "0.8.0"
+    agents_last_updated: "2025-11-23"
+    verified_against_commit: "611f616"  # Improve WinLoss tracker error handling and add comprehensive tests
 
   flutter:
     sdk_version: "0.1.2"

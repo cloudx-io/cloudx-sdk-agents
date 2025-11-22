@@ -171,8 +171,8 @@ dependencyResolutionManagement {
 Add to app-level `build.gradle.kts`:
 ```kotlin
 dependencies {
-    implementation("io.cloudx:sdk:0.6.1")
-    implementation("io.cloudx:adapter-cloudx:0.6.1")
+    implementation("io.cloudx:sdk:0.8.0")
+    implementation("io.cloudx:adapter-cloudx:0.8.0")
 
     // In first-look mode: KEEP existing AdMob/AppLovin dependencies
     // In CloudX-only mode: No other ad SDK dependencies needed
@@ -447,8 +447,8 @@ When integration is complete, provide a structured summary following this templa
 
 ### ✅ Integration Complete
 
-**[CloudX-Only Mode]:** CloudX SDK v0.6.1 integrated (standalone)
-**[First-Look Mode]:** CloudX SDK v0.6.1 first look integrated with fallback to [AdMob/AppLovin]
+**[CloudX-Only Mode]:** CloudX SDK v0.8.0 integrated (standalone)
+**[First-Look Mode]:** CloudX SDK v0.8.0 first look integrated with fallback to [AdMob/AppLovin]
 
 ### 📝 What Was Done
 
@@ -463,7 +463,7 @@ When integration is complete, provide a structured summary following this templa
 
 **2. Dependencies Added**
 - File: `app/build.gradle.kts`
-- Added CloudX SDK v0.6.1 and adapter
+- Added CloudX SDK v0.8.0 and adapter
 - [CloudX-Only Mode]: Standalone dependencies
 - [First-Look Mode]: Preserved existing ad SDK dependencies
 
@@ -617,7 +617,7 @@ Before reporting success to publisher, verify:
 **Code Quality (Universal):**
 - [ ] All code changes compile successfully
 - [ ] Maven repository configured in settings.gradle.kts (GitHub Packages URL)
-- [ ] CloudX SDK dependencies added correctly with version 0.6.1
+- [ ] CloudX SDK dependencies added correctly with version 0.8.0
 - [ ] Initialization code in Application class
 - [ ] All `.load()` calls present (CloudX doesn't auto-load)
 <!-- VALIDATION:IGNORE:START -->

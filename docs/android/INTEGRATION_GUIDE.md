@@ -76,8 +76,8 @@ Add CloudX SDK to app-level build.gradle:
 ```gradle
 dependencies {
     // CloudX SDK
-    implementation 'io.cloudx:sdk:0.6.1'
-    implementation 'io.cloudx:adapter-cloudx:0.6.1'
+    implementation 'io.cloudx:sdk:0.8.0'
+    implementation 'io.cloudx:adapter-cloudx:0.8.0'
 
     // Keep existing AdMob/AppLovin dependencies
     // implementation 'com.google.android.gms:play-services-ads:X.X.X'

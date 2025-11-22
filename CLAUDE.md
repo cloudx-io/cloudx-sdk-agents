@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This repository contains specialized Claude Code agents for automating CloudX SDK integration across multiple platforms (Android, Flutter, and future iOS). The agents help app publishers integrate CloudX SDK as a primary ad mediation layer with proper fallback to AdMob/AppLovin, reducing integration time from 4-6 hours to ~20 minutes.
 
 **Supported Platforms:**
-- **Android** (v0.6.1) - 4 agents - Production ready
+- **Android** (v0.8.0) - 4 agents - Production ready
 - **Flutter** (v0.1.2) - 4 agents - Production ready
 - **iOS** - Coming soon
 
@@ -96,7 +96,7 @@ Secondary Mediation (Fallback)
 
 ## Platform-Specific Integration Details
 
-### Android CloudX SDK API Reference (v0.6.1)
+### Android CloudX SDK API Reference (v0.8.0)
 
 **Critical Implementation Details**:
 - CloudX SDK **must** be initialized before attempting ad loads
