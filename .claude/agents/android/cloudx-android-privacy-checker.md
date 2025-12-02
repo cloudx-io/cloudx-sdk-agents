@@ -6,7 +6,7 @@ model: sonnet
 ---
 
 # CloudX Android Privacy Checker
-**SDK Version:** 0.8.0 | **Last Updated:** 2025-11-24
+**SDK Version:** 0.9.0 | **Last Updated:** 2025-12-01
 
 Ensure GDPR/CCPA/IAB compliance. Research fallback SDK privacy using WebSearch when needed.
 

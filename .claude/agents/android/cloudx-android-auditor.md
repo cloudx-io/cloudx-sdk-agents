@@ -6,7 +6,7 @@ model: sonnet
 ---
 
 # CloudX Android Audit Agent
-**SDK Version:** 0.8.0 | **Last Updated:** 2025-11-24
+**SDK Version:** 0.9.0 | **Last Updated:** 2025-12-01
 
 Audit CloudX implementation: correct API usage, CloudX as primary, fallback intact.
 
@@ -35,9 +35,9 @@ For each format verify:
 - Proper lifecycle (destroy() called)
 - Listener implemented
 
-**Banner/MREC/Native:**
+**Banner/MREC:**
 ```kotlin
-val banner = CloudX.createBanner("placement") // or createMREC/createNativeAdSmall/createNativeAdMedium
+val banner = CloudX.createBanner("placement") // or createMREC
 banner.listener = object : CloudXAdViewListener { /* all methods */ }
 container.addView(banner)
 banner.load()
@@ -124,9 +124,9 @@ Verify all APIs used correctly:
 | `load()` | After setting listener | Before setting listener |
 | `show()` | Check isAdReady first | Call without checking |
 | `destroy()` | In onDestroy() | Never called |
-| `startAutoRefresh()` | For banner/MREC/native | For interstitial/rewarded |
+| `startAutoRefresh()` | For banner/MREC | For interstitial/rewarded |
 
-**Complete API List (v0.8.0):**
+**Complete API List (v0.9.0):**
 
 Core SDK:
 - `CloudX.initialize(CloudXInitializationParams, CloudXInitializationListener?)`
@@ -134,8 +134,6 @@ Core SDK:
 - `CloudX.createMREC(String): CloudXAdView`
 - `CloudX.createInterstitial(String): CloudXInterstitialAd`
 - `CloudX.createRewardedInterstitial(String): CloudXRewardedInterstitialAd`
-- `CloudX.createNativeAdSmall(String): CloudXAdView`
-- `CloudX.createNativeAdMedium(String): CloudXAdView`
 - `CloudX.setPrivacy(CloudXPrivacy)`
 - `CloudX.setLoggingEnabled(Boolean)`
 - `CloudX.setMinLogLevel(CloudXLogLevel)`
@@ -188,16 +186,16 @@ grep -A3 "onAdLoadFailed" --include="*.kt" --include="*.java"
 
 ### 7. Dependencies Check
 
-**Verify correct dependencies (v0.8.0):**
+**Verify correct dependencies (v0.9.0):**
 ```bash
 grep "io.cloudx:sdk\|io.cloudx:adapter" build.gradle app/build.gradle build.gradle.kts app/build.gradle.kts
 ```
 
 Expected:
 ```gradle
-implementation("io.cloudx:sdk:0.8.0")
-implementation("io.cloudx:adapter-cloudx:0.8.0")
-implementation("io.cloudx:adapter-meta:0.8.0")
+implementation("io.cloudx:sdk:0.9.0")
+implementation("io.cloudx:adapter-cloudx:0.9.0")
+implementation("io.cloudx:adapter-meta:0.9.0")
 ```
 
 **Verify mavenCentral():**
@@ -207,11 +205,11 @@ grep -r "mavenCentral" settings.gradle settings.gradle.kts
 
 ### 8. Breaking Changes
 
-**v0.7.x to v0.8.0:**
+**v0.8.x to v0.9.0:**
 - No breaking changes in public APIs
 - All APIs backward compatible
 
-**v0.6.x to v0.8.0:**
+**v0.7.x to v0.9.0:**
 - Check if placement names changed
 - Verify error codes still handled correctly
 

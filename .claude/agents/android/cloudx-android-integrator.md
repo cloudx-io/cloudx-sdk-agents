@@ -6,7 +6,7 @@ model: sonnet
 ---
 
 # CloudX Android Integration Agent
-**SDK Version:** 0.8.0 | **Last Updated:** 2025-11-24
+**SDK Version:** 0.9.0 | **Last Updated:** 2025-12-01
 
 Implement CloudX as primary with fallback to AdMob/AppLovin/IronSource. Research fallback using WebSearch when needed.
 
@@ -31,9 +31,9 @@ dependencyResolutionManagement {
 Add to app/build.gradle.kts:
 ```gradle
 dependencies {
-    implementation("io.cloudx:sdk:0.8.0")
-    implementation("io.cloudx:adapter-cloudx:0.8.0")  // CloudX adapter
-    implementation("io.cloudx:adapter-meta:0.8.0")     // Meta adapter
+    implementation("io.cloudx:sdk:0.9.0")
+    implementation("io.cloudx:adapter-cloudx:0.9.0")  // CloudX adapter
+    implementation("io.cloudx:adapter-meta:0.9.0")     // Meta adapter
 }
 ```
 All three dependencies are required. User can remove adapters later if not needed.
@@ -212,22 +212,6 @@ rewardedAd.listener = object : CloudXRewardedInterstitialListener {
 rewardedAd.load()
 ```
 
-#### Native Ads (Small)
-```kotlin
-val nativeAdSmall = CloudX.createNativeAdSmall("native_feed")
-nativeAdSmall.listener = object : CloudXAdViewListener { /* same as banner */ }
-container.addView(nativeAdSmall)
-nativeAdSmall.load()
-```
-
-#### Native Ads (Medium)
-```kotlin
-val nativeAdMedium = CloudX.createNativeAdMedium("native_card")
-nativeAdMedium.listener = object : CloudXAdViewListener { /* same as banner */ }
-container.addView(nativeAdMedium)
-nativeAdMedium.load()
-```
-
 ### Step 6: Lifecycle
 Always call `destroy()` in onDestroy():
 ```kotlin
@@ -235,7 +219,6 @@ override fun onDestroy() {
     bannerAd?.destroy()
     interstitialAd?.destroy()
     rewardedAd?.destroy()
-    nativeAd?.destroy()
     super.onDestroy()
 }
 ```
@@ -256,8 +239,6 @@ bannerAd.stopAutoRefresh()   // Stop auto-refresh
 | `createMREC()` | `placementName: String` | `CloudXAdView` | Create 300x250 MREC |
 | `createInterstitial()` | `placementName: String` | `CloudXInterstitialAd` | Create interstitial ad |
 | `createRewardedInterstitial()` | `placementName: String` | `CloudXRewardedInterstitialAd` | Create rewarded ad |
-| `createNativeAdSmall()` | `placementName: String` | `CloudXAdView` | Create small native ad |
-| `createNativeAdMedium()` | `placementName: String` | `CloudXAdView` | Create medium native ad |
 | `setPrivacy()` | `CloudXPrivacy` | void | Set GDPR/CCPA flags (call BEFORE initialize) |
 | `setHashedUserId()` | `hashedUserId: String` | void | Set hashed user ID |
 | `setUserKeyValue()` | `key: String, value: String` | void | Set user key-value pair |
@@ -267,7 +248,7 @@ bannerAd.stopAutoRefresh()   // Stop auto-refresh
 | `setMinLogLevel()` | `CloudXLogLevel` | void | Set minimum log level |
 | `deinitialize()` | - | void | Deinitialize SDK |
 
-### CloudXAdView (Banner/MREC/Native)
+### CloudXAdView (Banner/MREC)
 | Property/Method | Type | Description |
 |----------------|------|-------------|
 | `listener` | `CloudXAdViewListener?` | Set ad listener |
@@ -341,7 +322,7 @@ bannerAd.stopAutoRefresh()   // Stop auto-refresh
 - `onInitialized()` - SDK initialized successfully
 - `onInitializationFailed(CloudXError)` - Initialization failed
 
-#### CloudXAdViewListener (Banner/MREC/Native)
+#### CloudXAdViewListener (Banner/MREC)
 - `onAdLoaded(CloudXAd)` - Ad loaded successfully
 - `onAdLoadFailed(CloudXError)` - Ad load failed
 - `onAdDisplayed(CloudXAd)` - Ad displayed
@@ -428,7 +409,7 @@ Example:
 ```
 [Brief summary of what was implemented]
 Example:
-- Integrated CloudX SDK v0.8.0
+- Integrated CloudX SDK v0.9.0
 - Implemented Banner and Interstitial ads
 - Added fallback to AdMob
 - Privacy compliance: GDPR consent dialog added
