@@ -6,7 +6,7 @@ model: sonnet
 ---
 
 # CloudX Android Audit Agent
-**SDK Version:** 0.9.0 | **Last Updated:** 2025-12-01
+**SDK Version:** 0.10.0 | **Last Updated:** 2025-12-04
 
 Audit CloudX implementation: correct API usage, CloudX as primary, fallback intact.
 
@@ -126,7 +126,7 @@ Verify all APIs used correctly:
 | `destroy()` | In onDestroy() | Never called |
 | `startAutoRefresh()` | For banner/MREC | For interstitial/rewarded |
 
-**Complete API List (v0.9.0):**
+**Complete API List (v0.10.0):**
 
 Core SDK:
 - `CloudX.initialize(CloudXInitializationParams, CloudXInitializationListener?)`
@@ -186,16 +186,21 @@ grep -A3 "onAdLoadFailed" --include="*.kt" --include="*.java"
 
 ### 7. Dependencies Check
 
-**Verify correct dependencies (v0.9.0):**
+**Verify correct dependencies (v0.10.0):**
 ```bash
 grep "io.cloudx:sdk\|io.cloudx:adapter" build.gradle app/build.gradle build.gradle.kts app/build.gradle.kts
 ```
 
-Expected:
+Expected (core SDK required):
 ```gradle
-implementation("io.cloudx:sdk:0.9.0")
-implementation("io.cloudx:adapter-cloudx:0.9.0")
-implementation("io.cloudx:adapter-meta:0.9.0")
+implementation("io.cloudx:sdk:0.10.0")
+```
+
+Optional adapters (recommended):
+```gradle
+implementation("io.cloudx:adapter-cloudx:0.10.0")
+implementation("io.cloudx:adapter-meta:0.10.0")
+implementation("io.cloudx:adapter-vungle:0.10.0")
 ```
 
 **Verify mavenCentral():**
@@ -205,11 +210,12 @@ grep -r "mavenCentral" settings.gradle settings.gradle.kts
 
 ### 8. Breaking Changes
 
-**v0.8.x to v0.9.0:**
+**v0.9.x to v0.10.0:**
 - No breaking changes in public APIs
 - All APIs backward compatible
+- New adapter: adapter-vungle (optional)
 
-**v0.7.x to v0.9.0:**
+**v0.8.x to v0.10.0:**
 - Check if placement names changed
 - Verify error codes still handled correctly
 
@@ -263,7 +269,7 @@ grep -A5 "onAdLoadFailed" --include="*.kt" --include="*.java"
 - Using deprecated CloudXInitializationServer parameter explicitly
 - Listener set after load() call
 - Wrong artifact ID (e.g., "cloudx-android-sdk" instead of "sdk")
-- Missing adapter dependencies (adapter-cloudx, adapter-meta)
+- Missing recommended adapter dependencies
 
 ## Audit Report Template
 

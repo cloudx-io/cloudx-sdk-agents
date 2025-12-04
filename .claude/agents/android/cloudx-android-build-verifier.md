@@ -7,7 +7,7 @@ model: sonnet
 
 # CloudX Android Build Verifier
 
-**SDK Version:** 0.9.0 | **Last Updated:** 2025-12-01
+**SDK Version:** 0.10.0 | **Last Updated:** 2025-12-04
 
 ## Mission
 Verify CloudX SDK integration compiles successfully.
@@ -16,18 +16,23 @@ Verify CloudX SDK integration compiles successfully.
 
 ### 1. Check Dependencies
 
-Verify SDK version in build.gradle matches 0.9.0:
+Verify SDK version in build.gradle matches 0.10.0:
 
 ```bash
 # Check CloudX dependency
 grep "io.cloudx:sdk\|io.cloudx:adapter" app/build.gradle build.gradle.kts app/build.gradle.kts
 ```
 
-Expected:
+Expected (minimum):
 ```gradle
-implementation("io.cloudx:sdk:0.9.0")
-implementation("io.cloudx:adapter-cloudx:0.9.0")
-implementation("io.cloudx:adapter-meta:0.9.0")
+implementation("io.cloudx:sdk:0.10.0")
+```
+
+Optional adapters:
+```gradle
+implementation("io.cloudx:adapter-cloudx:0.10.0")
+implementation("io.cloudx:adapter-meta:0.10.0")
+implementation("io.cloudx:adapter-vungle:0.10.0")
 ```
 
 **Check for dependency conflicts:**
@@ -76,7 +81,7 @@ All imports should resolve:
 grep -r "CloudX\." --include="*.kt" --include="*.java"
 ```
 
-Verify correct signatures (v0.9.0):
+Verify correct signatures (v0.10.0):
 - `CloudX.initialize(CloudXInitializationParams, CloudXInitializationListener?)`
 - `CloudX.createBanner(String): CloudXAdView`
 - `CloudX.createMREC(String): CloudXAdView`
@@ -106,7 +111,7 @@ Build must:
 - Zero compilation errors
 - Zero unresolved references
 - All CloudX imports resolve
-- All method signatures match v0.9.0
+- All method signatures match v0.10.0
 - Zero deprecation warnings for CloudX APIs (except CloudXInitializationServer parameter)
 
 ### 5. Manifest Verification
@@ -137,9 +142,11 @@ Verify:
 
 **Fix:** Add dependencies:
 ```gradle
-implementation("io.cloudx:sdk:0.9.0")
-implementation("io.cloudx:adapter-cloudx:0.9.0")
-implementation("io.cloudx:adapter-meta:0.9.0")
+implementation("io.cloudx:sdk:0.10.0")
+// Optional adapters
+implementation("io.cloudx:adapter-cloudx:0.10.0")
+implementation("io.cloudx:adapter-meta:0.10.0")
+implementation("io.cloudx:adapter-vungle:0.10.0")
 ```
 
 Then sync Gradle.
@@ -166,7 +173,7 @@ object : CloudXAdViewListener {
 
 ### Error: ProGuard/R8 obfuscation issues
 
-**Fix:** No special rules needed for v0.9.0. SDK handles consumer proguard rules automatically. If issues persist:
+**Fix:** No special rules needed for v0.10.0. SDK handles consumer proguard rules automatically. If issues persist:
 ```proguard
 -keep class io.cloudx.sdk.** { *; }
 ```

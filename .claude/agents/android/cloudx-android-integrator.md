@@ -6,7 +6,7 @@ model: sonnet
 ---
 
 # CloudX Android Integration Agent
-**SDK Version:** 0.9.0 | **Last Updated:** 2025-12-01
+**SDK Version:** 0.10.0 | **Last Updated:** 2025-12-04
 
 Implement CloudX as primary with fallback to AdMob/AppLovin/IronSource. Research fallback using WebSearch when needed.
 
@@ -31,12 +31,16 @@ dependencyResolutionManagement {
 Add to app/build.gradle.kts:
 ```gradle
 dependencies {
-    implementation("io.cloudx:sdk:0.9.0")
-    implementation("io.cloudx:adapter-cloudx:0.9.0")  // CloudX adapter
-    implementation("io.cloudx:adapter-meta:0.9.0")     // Meta adapter
+    // CloudX Core SDK
+    implementation("io.cloudx:sdk:0.10.0")
+
+    // Optional: CloudX Adapters (add as needed)
+    implementation("io.cloudx:adapter-cloudx:0.10.0")
+    implementation("io.cloudx:adapter-meta:0.10.0")
+    implementation("io.cloudx:adapter-vungle:0.10.0")
 }
 ```
-All three dependencies are required. User can remove adapters later if not needed.
+SDK is required. Adapters are optional but recommended for maximum fill rate.
 
 SDK published to Maven Central: https://mvnrepository.com/artifact/io.cloudx/sdk
 
@@ -409,7 +413,7 @@ Example:
 ```
 [Brief summary of what was implemented]
 Example:
-- Integrated CloudX SDK v0.9.0
+- Integrated CloudX SDK v0.10.0
 - Implemented Banner and Interstitial ads
 - Added fallback to AdMob
 - Privacy compliance: GDPR consent dialog added
