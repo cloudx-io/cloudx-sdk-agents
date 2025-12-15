@@ -7,7 +7,7 @@ model: sonnet
 
 # CloudX Android Build Verifier
 
-**SDK Version:** 0.11.0 | **Last Updated:** 2025-12-09
+**SDK Version:** 0.12.0 | **Last Updated:** 2025-12-15
 
 ## Mission
 Verify CloudX SDK integration compiles successfully.
@@ -16,7 +16,7 @@ Verify CloudX SDK integration compiles successfully.
 
 ### 1. Check Dependencies
 
-Verify SDK version in build.gradle matches 0.11.0:
+Verify SDK version in build.gradle matches 0.12.0:
 
 ```bash
 # Check CloudX dependency
@@ -25,14 +25,14 @@ grep "io.cloudx:sdk\|io.cloudx:adapter" app/build.gradle build.gradle.kts app/bu
 
 Expected (minimum):
 ```gradle
-implementation("io.cloudx:sdk:0.11.0")
+implementation("io.cloudx:sdk:0.12.0")
 ```
 
 Optional adapters:
 ```gradle
-implementation("io.cloudx:adapter-cloudx:0.11.0")
-implementation("io.cloudx:adapter-meta:0.11.0")
-implementation("io.cloudx:adapter-vungle:0.11.0")
+implementation("io.cloudx:adapter-cloudx:0.12.0")
+implementation("io.cloudx:adapter-meta:0.12.0")
+implementation("io.cloudx:adapter-vungle:0.12.0")
 ```
 
 **Check for dependency conflicts:**
@@ -64,7 +64,6 @@ All imports should resolve:
 - `io.cloudx.sdk.CloudXRewardedInterstitialAd`
 - `io.cloudx.sdk.CloudXInitializationParams`
 - `io.cloudx.sdk.CloudXInitializationListener`
-- `io.cloudx.sdk.CloudXPrivacy`
 - `io.cloudx.sdk.CloudXError`
 - `io.cloudx.sdk.CloudXErrorCode`
 - `io.cloudx.sdk.CloudXAd`
@@ -75,20 +74,21 @@ All imports should resolve:
 - `io.cloudx.sdk.CloudXAdRevenueListener`
 - `io.cloudx.sdk.CloudXDestroyable`
 
+Removed in v0.12.0 (should NOT be imported):
+- `io.cloudx.sdk.CloudXPrivacy` (removed)
+
 **Method signature errors:**
 ```bash
 # Check for incorrect method calls
 grep -r "CloudX\." --include="*.kt" --include="*.java"
 ```
 
-Verify correct signatures (v0.11.0):
+Verify correct signatures (v0.12.0):
 - `CloudX.initialize(CloudXInitializationParams, CloudXInitializationListener?)`
 - `CloudX.createBanner(String): CloudXAdView`
 - `CloudX.createMREC(String): CloudXAdView`
 - `CloudX.createInterstitial(String): CloudXInterstitialAd`
 - `CloudX.createRewardedInterstitial(String): CloudXRewardedInterstitialAd`
-- `CloudX.setPrivacy(CloudXPrivacy)`
-- `CloudX.setLoggingEnabled(Boolean)`
 - `CloudX.setMinLogLevel(CloudXLogLevel)`
 - `CloudX.setHashedUserId(String)`
 - `CloudX.setUserKeyValue(String, String)`
@@ -96,13 +96,22 @@ Verify correct signatures (v0.11.0):
 - `CloudX.clearAllKeyValues()`
 - `CloudX.deinitialize()`
 
-**Deprecated API usage:**
+Removed in v0.12.0 (should cause compilation errors):
+- `CloudX.setPrivacy(CloudXPrivacy)` (removed)
+- `CloudX.setLoggingEnabled(Boolean)` (removed)
+- `CloudXError.effectiveMessage` (removed, use `message` instead)
+
+**Deprecated/Removed API usage:**
 ```bash
+# Check for removed APIs (v0.12.0)
+grep -r "CloudXPrivacy\\|setPrivacy\\|effectiveMessage\\|setLoggingEnabled" --include="*.kt" --include="*.java"
+
 # Check for deprecated CloudXInitializationServer
 grep -r "CloudXInitializationServer" --include="*.kt" --include="*.java"
 ```
 
-Should only appear with `@Deprecated` warning.
+CloudXInitializationServer should only appear with `@Deprecated` warning.
+Removed APIs should cause compilation errors.
 
 ### 4. Validation Rules
 
@@ -110,8 +119,9 @@ Build must:
 - Complete without errors
 - Zero compilation errors
 - Zero unresolved references
-- All CloudX imports resolve
-- All method signatures match v0.11.0
+- All CloudX imports resolve (except removed CloudXPrivacy)
+- All method signatures match v0.12.0
+- No usage of removed APIs (CloudXPrivacy, setPrivacy, effectiveMessage, setLoggingEnabled)
 - Zero deprecation warnings for CloudX APIs (except CloudXInitializationServer parameter)
 
 ### 5. Manifest Verification
@@ -142,11 +152,11 @@ Verify:
 
 **Fix:** Add dependencies:
 ```gradle
-implementation("io.cloudx:sdk:0.11.0")
+implementation("io.cloudx:sdk:0.12.0")
 // Optional adapters
-implementation("io.cloudx:adapter-cloudx:0.11.0")
-implementation("io.cloudx:adapter-meta:0.11.0")
-implementation("io.cloudx:adapter-vungle:0.11.0")
+implementation("io.cloudx:adapter-cloudx:0.12.0")
+implementation("io.cloudx:adapter-meta:0.12.0")
+implementation("io.cloudx:adapter-vungle:0.12.0")
 ```
 
 Then sync Gradle.
@@ -171,9 +181,24 @@ object : CloudXAdViewListener {
 
 **Fix:** Check for conflicting AndroidManifest.xml entries. CloudX SDK handles its own manifest entries.
 
+### Error: "Unresolved reference: CloudXPrivacy" or "effectiveMessage"
+
+**Fix:** These APIs were removed in v0.12.0. Update code:
+```kotlin
+// OLD (v0.11.0 and earlier)
+CloudX.setPrivacy(CloudXPrivacy(isUserConsent = true))
+Log.e("Error", error.effectiveMessage)
+CloudX.setLoggingEnabled(false)
+
+// NEW (v0.12.0+)
+// Privacy handled automatically via IAB strings - no code needed
+Log.e("Error", error.message)
+CloudX.setMinLogLevel(CloudXLogLevel.NONE)
+```
+
 ### Error: ProGuard/R8 obfuscation issues
 
-**Fix:** No special rules needed for v0.11.0. SDK handles consumer proguard rules automatically. If issues persist:
+**Fix:** No special rules needed for v0.12.0. SDK handles consumer proguard rules automatically. If issues persist:
 ```proguard
 -keep class io.cloudx.sdk.** { *; }
 ```

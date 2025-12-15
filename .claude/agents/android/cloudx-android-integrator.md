@@ -6,7 +6,7 @@ model: sonnet
 ---
 
 # CloudX Android Integration Agent
-**SDK Version:** 0.11.0 | **Last Updated:** 2025-12-09
+**SDK Version:** 0.12.0 | **Last Updated:** 2025-12-15
 
 Implement CloudX as primary with fallback to AdMob/AppLovin/IronSource. Research fallback using WebSearch when needed.
 
@@ -32,12 +32,12 @@ Add to app/build.gradle.kts:
 ```gradle
 dependencies {
     // CloudX Core SDK
-    implementation("io.cloudx:sdk:0.11.0")
+    implementation("io.cloudx:sdk:0.12.0")
 
     // Optional: CloudX Adapters (add as needed)
-    implementation("io.cloudx:adapter-cloudx:0.11.0")
-    implementation("io.cloudx:adapter-meta:0.11.0")
-    implementation("io.cloudx:adapter-vungle:0.11.0")
+    implementation("io.cloudx:adapter-cloudx:0.12.0")
+    implementation("io.cloudx:adapter-meta:0.12.0")
+    implementation("io.cloudx:adapter-vungle:0.12.0")
 }
 ```
 SDK is required. Adapters are optional but recommended for maximum fill rate.
@@ -51,12 +51,6 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Set privacy BEFORE initialize (required for GDPR/CCPA)
-        CloudX.setPrivacy(CloudXPrivacy(
-            isUserConsent = true,      // GDPR consent
-            isAgeRestrictedUser = false // COPPA flag
-        ))
-
         // Initialize CloudX
         val params = CloudXInitializationParams(
             appKey = "YOUR_APP_KEY_HERE",
@@ -69,7 +63,7 @@ class MyApplication : Application() {
             }
 
             override fun onInitializationFailed(cloudXError: CloudXError) {
-                Log.e("CloudX", "Init failed: ${cloudXError.effectiveMessage}")
+                Log.e("CloudX", "Init failed: ${cloudXError.message}")
             }
         })
     }
@@ -84,18 +78,17 @@ Add to AndroidManifest.xml:
 ```
 
 ### Step 4: Privacy (GDPR/CCPA)
-Always call `setPrivacy()` BEFORE `initialize()`:
+CloudX automatically handles privacy compliance by reading IAB consent strings from SharedPreferences:
 ```kotlin
-// GDPR + CCPA
-CloudX.setPrivacy(CloudXPrivacy(
-    isUserConsent = true,      // GDPR: user gave consent
-    isAgeRestrictedUser = false // COPPA: not age-restricted
-))
-
 // IAB TCF/GPP support:
 // CloudX automatically reads IAB consent strings from SharedPreferences
-// Keys: IABTCF_TCString, IABGPP_HDR_GppString
+// Keys: IABTCF_TCString, IABTCF_gdprApplies, IABUSPrivacy_String,
+//       IABGPP_HDR_GppString, IABGPP_GppSID
 // No additional code needed - SDK reads these automatically
+
+// For GDPR (EU): SDK checks TCF v2 consent for purposes 1-2 and vendor consent (CloudX Vendor ID: 1510)
+// For CCPA (US): SDK checks for sale/sharing opt-out signals
+// When consent is denied, SDK automatically removes PII from ad requests
 ```
 
 ### Step 5: Ad Formats
@@ -117,7 +110,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onAdLoadFailed(cloudXError: CloudXError) {
-                Log.e("Banner", "Failed: ${cloudXError.effectiveMessage}")
+                Log.e("Banner", "Failed: ${cloudXError.message}")
                 // Fallback to AdMob/AppLovin here if needed
             }
 
@@ -167,7 +160,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onAdLoadFailed(cloudXError: CloudXError) {
-                Log.e("Interstitial", "Failed: ${cloudXError.effectiveMessage}")
+                Log.e("Interstitial", "Failed: ${cloudXError.message}")
                 // Fallback to AdMob/AppLovin here if needed
             }
 
@@ -243,13 +236,11 @@ bannerAd.stopAutoRefresh()   // Stop auto-refresh
 | `createMREC()` | `placementName: String` | `CloudXAdView` | Create 300x250 MREC |
 | `createInterstitial()` | `placementName: String` | `CloudXInterstitialAd` | Create interstitial ad |
 | `createRewardedInterstitial()` | `placementName: String` | `CloudXRewardedInterstitialAd` | Create rewarded ad |
-| `setPrivacy()` | `CloudXPrivacy` | void | Set GDPR/CCPA flags (call BEFORE initialize) |
 | `setHashedUserId()` | `hashedUserId: String` | void | Set hashed user ID |
 | `setUserKeyValue()` | `key: String, value: String` | void | Set user key-value pair |
 | `setAppKeyValue()` | `key: String, value: String` | void | Set app key-value pair |
 | `clearAllKeyValues()` | - | void | Clear all key-values |
-| `setLoggingEnabled()` | `isEnabled: Boolean` | void | Enable/disable logging |
-| `setMinLogLevel()` | `CloudXLogLevel` | void | Set minimum log level |
+| `setMinLogLevel()` | `CloudXLogLevel` | void | Set minimum log level (use CloudXLogLevel.NONE to disable) |
 | `deinitialize()` | - | void | Deinitialize SDK |
 
 ### CloudXAdView (Banner/MREC)
@@ -288,19 +279,12 @@ bannerAd.stopAutoRefresh()   // Stop auto-refresh
 | `testMode` | Boolean | false | Enable test ads |
 | `initServer` | CloudXInitializationServer | Production | Server environment (deprecated) |
 
-### CloudXPrivacy
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `isUserConsent` | Boolean? | null | GDPR consent (true=consent, false=no consent, null=not set) |
-| `isAgeRestrictedUser` | Boolean? | null | COPPA flag (true=child, false=adult, null=not set) |
-
 ### CloudXError
 | Property | Type | Description |
 |----------|------|-------------|
 | `code` | CloudXErrorCode | Error code enum |
-| `message` | String? | Custom error message |
+| `message` | String | Error message (non-null) |
 | `cause` | Throwable? | Underlying exception |
-| `effectiveMessage` | String | Effective error message |
 
 ### CloudXErrorCode (Selected Codes)
 - `NOT_INITIALIZED` (100) - SDK not initialized
@@ -319,6 +303,7 @@ bannerAd.stopAutoRefresh()   // Stop auto-refresh
 - `INFO` (2)
 - `WARN` (3)
 - `ERROR` (4)
+- `NONE` (5) - Disable all logging
 
 ### Listeners
 
@@ -362,8 +347,8 @@ bannerAd.stopAutoRefresh()   // Stop auto-refresh
 
 ## Best Practices & Common Issues
 
-1. **Privacy First**: Always call `setPrivacy()` BEFORE `initialize()`
-2. **IAB TCF/GPP**: SDK auto-reads IAB strings from SharedPreferences (IABTCF_TCString, IABGPP_HDR_GppString)
+1. **Privacy Automatic**: SDK automatically handles GDPR/CCPA via IAB strings - no manual privacy calls needed
+2. **IAB TCF/GPP**: SDK auto-reads IAB strings from SharedPreferences (IABTCF_TCString, IABGPP_HDR_GppString, IABUSPrivacy_String)
 3. **Lifecycle**: Always call `destroy()` in onDestroy()
 4. **Check isAdReady**: For fullscreen ads, check `isAdReady` before calling `show()`
 5. **Auto-refresh**: Call `startAutoRefresh()` after adding banner to layout
@@ -376,11 +361,10 @@ bannerAd.stopAutoRefresh()   // Stop auto-refresh
 ## Testing Checklist
 
 ### Universal Checks (All Modes)
-- [ ] CloudX SDK dependencies added (sdk, adapter-cloudx, adapter-meta)
+- [ ] CloudX SDK dependencies added (sdk, adapter-cloudx, adapter-meta, adapter-vungle)
 - [ ] mavenCentral() repository configured
 - [ ] CloudX.initialize() called in Application.onCreate()
 - [ ] Application class registered in AndroidManifest.xml
-- [ ] Privacy set BEFORE initialize (if applicable)
 - [ ] All ad formats load and display correctly
 - [ ] destroy() called in onDestroy()
 - [ ] Test mode enabled for development
@@ -391,7 +375,6 @@ bannerAd.stopAutoRefresh()   // Stop auto-refresh
 - [ ] CloudX ads load first (primary)
 - [ ] Fallback SDK initialized separately
 - [ ] Fallback triggered only in onAdLoadFailed()
-- [ ] Privacy signals forwarded to fallback SDK
 - [ ] Both SDKs can coexist without conflicts
 - [ ] Fallback ads load and display correctly
 - [ ] No circular fallback loops
@@ -413,10 +396,10 @@ Example:
 ```
 [Brief summary of what was implemented]
 Example:
-- Integrated CloudX SDK v0.10.0
+- Integrated CloudX SDK v0.12.0
 - Implemented Banner and Interstitial ads
 - Added fallback to AdMob
-- Privacy compliance: GDPR consent dialog added
+- Privacy compliance: IAB TCF/GPP automatically handled
 - Test mode enabled for development
 ```
 
@@ -425,7 +408,6 @@ Example:
 Before reporting completion, verify:
 - [ ] Mode detected (CloudX-only or CloudX+Fallback)
 - [ ] All code examples compile
-- [ ] Privacy set BEFORE initialize
 - [ ] Fallback logic correct (if applicable)
 - [ ] Credentials handled (appKey reminder if needed)
 - [ ] Bundle ID reminder added

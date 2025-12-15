@@ -6,7 +6,7 @@ model: sonnet
 ---
 
 # CloudX Android Audit Agent
-**SDK Version:** 0.11.0 | **Last Updated:** 2025-12-09
+**SDK Version:** 0.12.0 | **Last Updated:** 2025-12-15
 
 Audit CloudX implementation: correct API usage, CloudX as primary, fallback intact.
 
@@ -80,25 +80,23 @@ grep -r "\.destroy()" --include="*.kt" --include="*.java"
 ```
 
 ### 3. Privacy
-- GDPR/CCPA/COPPA handled
-- setPrivacy() called BEFORE initialize()
+- GDPR/CCPA handled automatically via IAB strings
+- CMP writes consent to SharedPreferences
 - IAB TCF/GPP readable (if CMP used)
 
-**Check order:**
+**CloudX automatically reads IAB strings:**
 ```kotlin
-// Correct
-CloudX.setPrivacy(CloudXPrivacy(isUserConsent = true))
-CloudX.initialize(params, listener)
-
-// Wrong - privacy after init
-CloudX.initialize(params, listener)
-CloudX.setPrivacy(privacy) // Too late!
+// SDK auto-reads these keys from SharedPreferences:
+// - IABTCF_TCString, IABTCF_gdprApplies (TCF v2)
+// - IABUSPrivacy_String (CCPA legacy)
+// - IABGPP_HDR_GppString, IABGPP_GppSID (GPP modern)
+// No manual privacy calls needed
 ```
 
-**Verify:**
+**Verify CMP integration:**
 ```bash
-# Find privacy calls
-grep -r "CloudX.setPrivacy" --include="*.kt" --include="*.java"
+# Check for CMP usage
+grep -r "IABTCF\|IABGPP\|IABUSPrivacy" --include="*.kt" --include="*.java"
 ```
 
 ### 4. Memory Management
@@ -119,14 +117,14 @@ Verify all APIs used correctly:
 | API | Correct Usage | Common Mistake |
 |-----|---------------|----------------|
 | `initialize()` | In Application.onCreate() | In Activity |
-| `setPrivacy()` | Before initialize() | After initialize() |
 | `createBanner()` | Returns CloudXAdView | Not added to layout |
 | `load()` | After setting listener | Before setting listener |
 | `show()` | Check isAdReady first | Call without checking |
 | `destroy()` | In onDestroy() | Never called |
 | `startAutoRefresh()` | For banner/MREC | For interstitial/rewarded |
+| `setMinLogLevel()` | Use CloudXLogLevel.NONE to disable | Using deprecated setLoggingEnabled() |
 
-**Complete API List (v0.11.0):**
+**Complete API List (v0.12.0):**
 
 Core SDK:
 - `CloudX.initialize(CloudXInitializationParams, CloudXInitializationListener?)`
@@ -134,8 +132,6 @@ Core SDK:
 - `CloudX.createMREC(String): CloudXAdView`
 - `CloudX.createInterstitial(String): CloudXInterstitialAd`
 - `CloudX.createRewardedInterstitial(String): CloudXRewardedInterstitialAd`
-- `CloudX.setPrivacy(CloudXPrivacy)`
-- `CloudX.setLoggingEnabled(Boolean)`
 - `CloudX.setMinLogLevel(CloudXLogLevel)`
 - `CloudX.setHashedUserId(String)`
 - `CloudX.setUserKeyValue(String, String)`
@@ -160,6 +156,9 @@ Fullscreen Ads:
 
 **Verify no deprecated APIs:**
 ```bash
+# Search for deprecated APIs (removed in v0.12.0)
+grep -r "CloudXPrivacy\\|setPrivacy\\|effectiveMessage\\|setLoggingEnabled" --include="*.kt" --include="*.java"
+
 # Search for CloudXInitializationServer usage (deprecated)
 grep -r "CloudXInitializationServer\\.Production\\|CloudXInitializationServer\\.Staging" --include="*.kt" --include="*.java"
 ```
@@ -186,21 +185,21 @@ grep -A3 "onAdLoadFailed" --include="*.kt" --include="*.java"
 
 ### 7. Dependencies Check
 
-**Verify correct dependencies (v0.11.0):**
+**Verify correct dependencies (v0.12.0):**
 ```bash
 grep "io.cloudx:sdk\|io.cloudx:adapter" build.gradle app/build.gradle build.gradle.kts app/build.gradle.kts
 ```
 
 Expected (core SDK required):
 ```gradle
-implementation("io.cloudx:sdk:0.11.0")
+implementation("io.cloudx:sdk:0.12.0")
 ```
 
 Optional adapters (recommended):
 ```gradle
-implementation("io.cloudx:adapter-cloudx:0.11.0")
-implementation("io.cloudx:adapter-meta:0.11.0")
-implementation("io.cloudx:adapter-vungle:0.11.0")
+implementation("io.cloudx:adapter-cloudx:0.12.0")
+implementation("io.cloudx:adapter-meta:0.12.0")
+implementation("io.cloudx:adapter-vungle:0.12.0")
 ```
 
 **Verify mavenCentral():**
@@ -210,18 +209,22 @@ grep -r "mavenCentral" settings.gradle settings.gradle.kts
 
 ### 8. Breaking Changes
 
-**v0.10.x to v0.11.0:**
-- No breaking changes in public APIs
-- All APIs backward compatible
-- All existing adapters remain compatible
+**v0.11.x to v0.12.0:**
+- Removed `CloudXError.effectiveMessage` - use `message` directly (now non-null)
+- Removed `setLoggingEnabled()` - use `setMinLogLevel(CloudXLogLevel.NONE)` instead
+- Removed `CloudXPrivacy` class - privacy now handled automatically via GPP/TCF
+- Simplified TCF purpose checks to only require purposes 1 and 2
 
-**v0.9.x to v0.11.0:**
-- No breaking changes in public APIs
-- Adapter: adapter-vungle available (optional)
+**v0.10.x to v0.12.0:**
+- Same breaking changes as above
+- All adapters remain compatible
 
-**Verify:**
+**Verify migration:**
 ```bash
-# Check SDK version in build.gradle
+# Check for removed APIs
+grep -r "effectiveMessage\\|setLoggingEnabled\\|CloudXPrivacy\\|setPrivacy" --include="*.kt" --include="*.java"
+
+# Check SDK version
 grep "io.cloudx:sdk" build.gradle app/build.gradle build.gradle.kts app/build.gradle.kts
 ```
 
@@ -237,22 +240,17 @@ grep -r "import io.cloudx.sdk" --include="*.kt" --include="*.java"
 grep -r "CloudX.initialize" --include="*.kt" --include="*.java"
 ```
 
-3. **Verify privacy:**
-```bash
-grep -r "CloudX.setPrivacy" --include="*.kt" --include="*.java"
-```
-
-4. **Check ad formats:**
+3. **Check ad formats:**
 ```bash
 grep -r "CloudX.create" --include="*.kt" --include="*.java"
 ```
 
-5. **Verify lifecycle:**
+4. **Verify lifecycle:**
 ```bash
 grep -r "\.destroy()" --include="*.kt" --include="*.java"
 ```
 
-6. **Check fallback:**
+5. **Check fallback:**
 ```bash
 grep -A5 "onAdLoadFailed" --include="*.kt" --include="*.java"
 ```
@@ -260,7 +258,7 @@ grep -A5 "onAdLoadFailed" --include="*.kt" --include="*.java"
 ## Red Flags
 
 - CloudX initialization in Activity (not Application)
-- setPrivacy() after initialize()
+- Using removed APIs (CloudXPrivacy, setPrivacy(), effectiveMessage, setLoggingEnabled())
 - Missing destroy() calls
 - No fallback in onAdLoadFailed()
 - show() without checking isAdReady
