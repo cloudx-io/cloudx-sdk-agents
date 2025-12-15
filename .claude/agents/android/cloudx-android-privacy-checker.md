@@ -6,7 +6,7 @@ model: sonnet
 ---
 
 # CloudX Android Privacy Checker
-**SDK Version:** 0.11.0 | **Last Updated:** 2025-12-09
+**SDK Version:** 0.12.0 | **Last Updated:** 2025-12-15
 
 Ensure GDPR/CCPA/IAB compliance. Research fallback SDK privacy using WebSearch when needed.
 
@@ -16,36 +16,33 @@ Ensure GDPR/CCPA/IAB compliance. Research fallback SDK privacy using WebSearch w
 
 **Requirements:**
 - Consent dialog shown before ads
-- setPrivacy() called with user consent
-- Consent stored and persisted
+- CMP writes IAB consent strings to SharedPreferences
+- CloudX automatically reads consent
 - User can withdraw consent
 
 **Verify:**
 ```bash
-# Find setPrivacy calls
-grep -r "CloudX.setPrivacy" --include="*.kt" --include="*.java"
-
-# Check CloudXPrivacy usage
-grep -r "CloudXPrivacy" --include="*.kt" --include="*.java"
+# Check for CMP integration
+grep -r "IABTCF\|IABGPP" --include="*.kt" --include="*.java"
 ```
 
-**Correct implementation:**
+**How it works (v0.12.0+):**
 ```kotlin
-// Before ads
-CloudX.setPrivacy(CloudXPrivacy(isUserConsent = true))
-CloudX.initialize(params, listener)
+// CloudX automatically reads IAB consent strings from SharedPreferences:
+// - IABTCF_TCString, IABTCF_gdprApplies (TCF v2)
+// - IABGPP_HDR_GppString, IABGPP_GppSID (GPP)
+// No manual privacy calls needed
 
-// Update when consent changes
-fun onConsentChanged(hasConsent: Boolean) {
-    CloudX.setPrivacy(CloudXPrivacy(isUserConsent = hasConsent))
-}
+// For GDPR (EU): SDK checks TCF v2 consent for purposes 1-2
+// and vendor consent (CloudX Vendor ID: 1510)
+// When consent is denied, SDK automatically removes PII from ad requests
 ```
 
 **Red flags:**
-- No setPrivacy() call
-- setPrivacy() after initialize()
+- No CMP integration detected
 - Consent not checked before ads
 - No consent withdrawal mechanism
+- Using removed setPrivacy() API
 
 ### 2. CCPA (California)
 
@@ -54,29 +51,29 @@ fun onConsentChanged(hasConsent: Boolean) {
 - Opt-out stored and respected
 - Privacy signals passed to ad SDKs
 
-**Verify:**
+**How it works (v0.12.0+):**
 ```kotlin
-// CCPA opt-out
-CloudX.setPrivacy(CloudXPrivacy(isUserConsent = false)) // User opted out
+// CloudX automatically reads CCPA consent from SharedPreferences:
+// - IABUSPrivacy_String (legacy CCPA)
+// - IABGPP_HDR_GppString + IABGPP_GppSID (modern GPP)
+// No manual privacy calls needed
+
+// For CCPA (US): SDK checks for sale/sharing opt-out signals
+// When user opts out, SDK automatically removes PII from ad requests
 ```
 
-**Check fallback SDKs receive signals:**
+**Verify CMP integration:**
 ```bash
-# Search for CCPA handling in AdMob/AppLovin/IronSource
-grep -r "setHasUserConsent\|setDoNotSell\|setCCPAConsent" --include="*.kt" --include="*.java"
+# Check for CCPA handling
+grep -r "IABUSPrivacy\|IABGPP" --include="*.kt" --include="*.java"
 ```
 
 ### 3. COPPA (Children's Privacy)
 
-**Requirements:**
-- Age-restricted flag set if targeting children
-- Limited data collection for children
-
-**Verify:**
-```kotlin
-// For apps targeting children
-CloudX.setPrivacy(CloudXPrivacy(isAgeRestrictedUser = true))
-```
+**Note:** COPPA handling was removed in v0.12.0. Apps targeting children should:
+- Use a CMP that sets appropriate GPP/TCF flags
+- Ensure CMP restricts data collection per COPPA requirements
+- CloudX will automatically respect privacy signals from the CMP
 
 ### 4. IAB TCF/GPP (if applicable)
 
@@ -125,21 +122,18 @@ grep -r "privacy.*policy\|Privacy.*Policy" --include="*.kt" --include="*.java" -
 
 ### 6. SDK Configuration
 
-**Verify correct order:**
+**v0.12.0+ (automatic privacy):**
 ```kotlin
-// Correct
-CloudX.setPrivacy(privacy)  // BEFORE initialize
+// CloudX automatically handles privacy via IAB strings
+// No manual configuration needed - SDK reads from SharedPreferences
 CloudX.initialize(params, listener)
-
-// Wrong
-CloudX.initialize(params, listener)
-CloudX.setPrivacy(privacy)  // TOO LATE!
 ```
 
-**Check:**
+**Check for removed APIs:**
 ```bash
-# Find initialization and privacy calls
-grep -B2 -A2 "CloudX.initialize\|CloudX.setPrivacy" --include="*.kt" --include="*.java"
+# These APIs were removed in v0.12.0
+grep -r "CloudXPrivacy\\|setPrivacy" --include="*.kt" --include="*.java"
+# Should return no results in new integrations
 ```
 
 ### 7. Fallback SDK Privacy
@@ -175,16 +169,15 @@ grep -r "UserMessagingPlatform\|AppLovinPrivacySettings\|IronSource.setConsent" 
 
 ## Validation Steps
 
-1. **Search CloudXPrivacy usage:**
+1. **Check for CMP integration:**
 ```bash
-grep -r "CloudXPrivacy" --include="*.kt" --include="*.java"
+grep -r "IABTCF\|IABGPP\|IABUSPrivacy" --include="*.kt" --include="*.java"
 ```
 
-2. **Check consent obtained before ads:**
+2. **Verify no removed APIs:**
 ```bash
-# Find ad loading
-grep -r "\.load()\|\.show()" --include="*.kt" --include="*.java"
-# Ensure setPrivacy() called first
+# These should return no results in v0.12.0+
+grep -r "CloudXPrivacy\\|setPrivacy" --include="*.kt" --include="*.java"
 ```
 
 3. **Verify privacy policy:**
@@ -207,24 +200,24 @@ grep -r "onAdLoadFailed" -A10 --include="*.kt" --include="*.java" | grep -i "con
 
 - Ads loaded without consent
 - Missing privacy policy
-- setPrivacy() after initialize()
+- No CMP integration detected (no IAB strings)
 - No GDPR consent dialog for EU users
 - No CCPA opt-out for California users
-- CMP writes IAB strings but CloudX initialized before CMP
+- CloudX initialized before CMP sets consent
 - Fallback SDKs (AdMob/AppLovin/IronSource) missing privacy configuration
 - Collecting PII without consent
-- isAgeRestrictedUser not set for child-directed apps
+- Using removed APIs (CloudXPrivacy, setPrivacy)
 
 ## Compliance Checklist
 
-- [ ] CloudX.setPrivacy() called before initialize()
+- [ ] CMP integration present (writes IAB strings to SharedPreferences)
 - [ ] GDPR consent dialog for EU users
 - [ ] CCPA opt-out mechanism for California users
-- [ ] COPPA compliance (isAgeRestrictedUser) if targeting children
-- [ ] CMP integration (if using IAB TCF/GPP)
+- [ ] CloudX SDK v0.12.0+ (automatic privacy handling)
+- [ ] No usage of removed APIs (CloudXPrivacy, setPrivacy)
 - [ ] Privacy policy exists and mentions CloudX
 - [ ] User can withdraw consent
-- [ ] Privacy signals forwarded to fallback SDKs
+- [ ] Privacy signals forwarded to fallback SDKs (if applicable)
 - [ ] No PII collected without consent
 - [ ] Consent persisted across sessions
 
@@ -235,12 +228,13 @@ After validation:
 ### Compliance Status
 - GDPR: [Compliant / Non-compliant]
 - CCPA: [Compliant / Non-compliant]
-- COPPA: [Compliant / Non-compliant / N/A]
 - IAB TCF/GPP: [Present / Not detected / N/A]
 - Privacy Policy: [Present / Missing]
+- SDK Version: [v0.12.0+ (automatic) / v0.11.0 or earlier (manual)]
 
 ### Implementation
-- setPrivacy() location: [Before init / After init / Not found]
+- CMP integration: [Present / Missing]
+- IAB strings detected: [IABTCF_TCString / IABGPP_HDR_GppString / IABUSPrivacy_String / None]
 - Consent dialog: [Present / Missing]
 - Fallback SDK privacy: [Configured / Not configured / N/A]
 
