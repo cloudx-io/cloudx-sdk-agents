@@ -31,6 +31,7 @@ implementation("io.cloudx:sdk:0.12.0")
 Optional adapters:
 ```gradle
 implementation("io.cloudx:adapter-cloudx:0.12.0")
+implementation("io.cloudx:adapter-inmobi:0.12.0")
 implementation("io.cloudx:adapter-meta:0.12.0")
 implementation("io.cloudx:adapter-vungle:0.12.0")
 ```
@@ -155,6 +156,7 @@ Verify:
 implementation("io.cloudx:sdk:0.12.0")
 // Optional adapters
 implementation("io.cloudx:adapter-cloudx:0.12.0")
+implementation("io.cloudx:adapter-inmobi:0.12.0")
 implementation("io.cloudx:adapter-meta:0.12.0")
 implementation("io.cloudx:adapter-vungle:0.12.0")
 ```

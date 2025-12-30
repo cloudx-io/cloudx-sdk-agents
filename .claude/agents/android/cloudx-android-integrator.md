@@ -36,6 +36,7 @@ dependencies {
 
     // Optional: CloudX Adapters (add as needed)
     implementation("io.cloudx:adapter-cloudx:0.12.0")
+    implementation("io.cloudx:adapter-inmobi:0.12.0")
     implementation("io.cloudx:adapter-meta:0.12.0")
     implementation("io.cloudx:adapter-vungle:0.12.0")
 }
@@ -361,7 +362,7 @@ bannerAd.stopAutoRefresh()   // Stop auto-refresh
 ## Testing Checklist
 
 ### Universal Checks (All Modes)
-- [ ] CloudX SDK dependencies added (sdk, adapter-cloudx, adapter-meta, adapter-vungle)
+- [ ] CloudX SDK dependencies added (sdk, adapter-cloudx, adapter-inmobi, adapter-meta, adapter-vungle)
 - [ ] mavenCentral() repository configured
 - [ ] CloudX.initialize() called in Application.onCreate()
 - [ ] Application class registered in AndroidManifest.xml

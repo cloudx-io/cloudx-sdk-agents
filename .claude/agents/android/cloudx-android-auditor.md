@@ -198,6 +198,7 @@ implementation("io.cloudx:sdk:0.12.0")
 Optional adapters (recommended):
 ```gradle
 implementation("io.cloudx:adapter-cloudx:0.12.0")
+implementation("io.cloudx:adapter-inmobi:0.12.0")
 implementation("io.cloudx:adapter-meta:0.12.0")
 implementation("io.cloudx:adapter-vungle:0.12.0")
 ```
