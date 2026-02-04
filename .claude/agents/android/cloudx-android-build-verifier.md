@@ -7,7 +7,7 @@ model: sonnet
 
 # CloudX Android Build Verifier
 
-**SDK Version:** 0.12.0 | **Last Updated:** 2025-12-15
+**SDK Version:** 2.0.0 | **Last Updated:** 2026-02-04
 
 ## Mission
 Verify CloudX SDK integration compiles successfully.
@@ -16,7 +16,7 @@ Verify CloudX SDK integration compiles successfully.
 
 ### 1. Check Dependencies
 
-Verify SDK version in build.gradle matches 0.12.0:
+Verify SDK version in build.gradle matches 2.0.0:
 
 ```bash
 # Check CloudX dependency
@@ -25,14 +25,15 @@ grep "io.cloudx:sdk\|io.cloudx:adapter" app/build.gradle build.gradle.kts app/bu
 
 Expected (minimum):
 ```gradle
-implementation("io.cloudx:sdk:0.12.0")
+implementation("io.cloudx:sdk:2.0.0")
 ```
 
 Optional adapters:
 ```gradle
-implementation("io.cloudx:adapter-cloudx:0.12.0")
-implementation("io.cloudx:adapter-meta:0.12.0")
-implementation("io.cloudx:adapter-vungle:0.12.0")
+implementation("io.cloudx:adapter-cloudx:2.0.0")
+implementation("io.cloudx:adapter-meta:2.0.0")       // Meta Audience Network 6.21.0
+implementation("io.cloudx:adapter-vungle:2.0.0")     // Vungle SDK 7.6.1
+implementation("io.cloudx:adapter-inmobi:2.0.0")     // InMobi SDK 11.1.0
 ```
 
 **Check for dependency conflicts:**
@@ -61,21 +62,26 @@ All imports should resolve:
 - `io.cloudx.sdk.CloudX`
 - `io.cloudx.sdk.CloudXAdView`
 - `io.cloudx.sdk.CloudXInterstitialAd`
-- `io.cloudx.sdk.CloudXRewardedInterstitialAd`
-- `io.cloudx.sdk.CloudXInitializationParams`
+- `io.cloudx.sdk.CloudXRewardedAd`
+- `io.cloudx.sdk.CloudXInitializationConfiguration`
 - `io.cloudx.sdk.CloudXInitializationListener`
+- `io.cloudx.sdk.CloudXSdkConfiguration`
 - `io.cloudx.sdk.CloudXError`
 - `io.cloudx.sdk.CloudXErrorCode`
 - `io.cloudx.sdk.CloudXAd`
+- `io.cloudx.sdk.CloudXAdFormat`
+- `io.cloudx.sdk.CloudXReward`
 - `io.cloudx.sdk.CloudXLogLevel`
 - `io.cloudx.sdk.CloudXAdViewListener`
 - `io.cloudx.sdk.CloudXInterstitialListener`
-- `io.cloudx.sdk.CloudXRewardedInterstitialListener`
+- `io.cloudx.sdk.CloudXRewardedListener`
 - `io.cloudx.sdk.CloudXAdRevenueListener`
-- `io.cloudx.sdk.CloudXDestroyable`
 
-Removed in v0.12.0 (should NOT be imported):
-- `io.cloudx.sdk.CloudXPrivacy` (removed)
+Removed/deprecated (should NOT be imported):
+- `io.cloudx.sdk.CloudXPrivacy` (removed in v0.12.0)
+- `io.cloudx.sdk.CloudXInitializationParams` (replaced by CloudXInitializationConfiguration in v2.0.0)
+- `io.cloudx.sdk.CloudXRewardedInterstitialAd` (replaced by CloudXRewardedAd in v2.0.0)
+- `io.cloudx.sdk.CloudXRewardedInterstitialListener` (replaced by CloudXRewardedListener in v2.0.0)
 
 **Method signature errors:**
 ```bash
@@ -83,34 +89,42 @@ Removed in v0.12.0 (should NOT be imported):
 grep -r "CloudX\." --include="*.kt" --include="*.java"
 ```
 
-Verify correct signatures (v0.12.0):
-- `CloudX.initialize(CloudXInitializationParams, CloudXInitializationListener?)`
-- `CloudX.createBanner(String): CloudXAdView`
-- `CloudX.createMREC(String): CloudXAdView`
-- `CloudX.createInterstitial(String): CloudXInterstitialAd`
-- `CloudX.createRewardedInterstitial(String): CloudXRewardedInterstitialAd`
+Verify correct signatures (v2.0.0):
+- `CloudX.initialize(CloudXInitializationConfiguration, CloudXInitializationListener?)`
+- `CloudX.createBanner(String adUnitId): CloudXAdView`
+- `CloudX.createMREC(String adUnitId): CloudXAdView`
+- `CloudX.createInterstitial(String adUnitId): CloudXInterstitialAd`
+- `CloudX.createRewarded(String adUnitId): CloudXRewardedAd`
 - `CloudX.setMinLogLevel(CloudXLogLevel)`
 - `CloudX.setHashedUserId(String)`
 - `CloudX.setUserKeyValue(String, String)`
 - `CloudX.setAppKeyValue(String, String)`
 - `CloudX.clearAllKeyValues()`
-- `CloudX.deinitialize()`
+- `CloudXInterstitialAd.show(Activity)` or `show(Activity, String)` or `show(Activity, String, String)`
+- `CloudXRewardedAd.show(Activity)` or `show(Activity, String)` or `show(Activity, String, String)`
+- `CloudXAdView.setPlacement(String)`
+- `CloudXAdView.setCustomData(String)`
 
-Removed in v0.12.0 (should cause compilation errors):
-- `CloudX.setPrivacy(CloudXPrivacy)` (removed)
-- `CloudX.setLoggingEnabled(Boolean)` (removed)
-- `CloudXError.effectiveMessage` (removed, use `message` instead)
+Removed/deprecated (should cause compilation errors):
+- `CloudX.setPrivacy(CloudXPrivacy)` (removed in v0.12.0)
+- `CloudX.setLoggingEnabled(Boolean)` (removed in v0.12.0)
+- `CloudXError.effectiveMessage` (removed in v0.12.0, use `message` instead)
+- `CloudX.createRewardedInterstitial(String)` (replaced by createRewarded in v2.0.0)
+- `CloudXInitializationParams` (replaced by CloudXInitializationConfiguration in v2.0.0)
+- `show()` without Activity parameter (v2.0.0 requires Activity)
 
 **Deprecated/Removed API usage:**
 ```bash
-# Check for removed APIs (v0.12.0)
+# Check for removed APIs (v0.12.0+)
 grep -r "CloudXPrivacy\\|setPrivacy\\|effectiveMessage\\|setLoggingEnabled" --include="*.kt" --include="*.java"
 
-# Check for deprecated CloudXInitializationServer
-grep -r "CloudXInitializationServer" --include="*.kt" --include="*.java"
+# Check for old initialization pattern (v2.0.0)
+grep -r "CloudXInitializationParams\\|CloudXInitializationServer" --include="*.kt" --include="*.java"
+
+# Check for old rewarded API (v2.0.0)
+grep -r "createRewardedInterstitial\\|CloudXRewardedInterstitialAd\\|CloudXRewardedInterstitialListener" --include="*.kt" --include="*.java"
 ```
 
-CloudXInitializationServer should only appear with `@Deprecated` warning.
 Removed APIs should cause compilation errors.
 
 ### 4. Validation Rules
@@ -119,10 +133,10 @@ Build must:
 - Complete without errors
 - Zero compilation errors
 - Zero unresolved references
-- All CloudX imports resolve (except removed CloudXPrivacy)
-- All method signatures match v0.12.0
-- No usage of removed APIs (CloudXPrivacy, setPrivacy, effectiveMessage, setLoggingEnabled)
-- Zero deprecation warnings for CloudX APIs (except CloudXInitializationServer parameter)
+- All CloudX imports resolve (except removed/deprecated APIs)
+- All method signatures match v2.0.0
+- No usage of removed APIs (CloudXPrivacy, setPrivacy, effectiveMessage, setLoggingEnabled, CloudXInitializationParams, createRewardedInterstitial)
+- Zero deprecation warnings for CloudX APIs
 
 ### 5. Manifest Verification
 
@@ -152,11 +166,12 @@ Verify:
 
 **Fix:** Add dependencies:
 ```gradle
-implementation("io.cloudx:sdk:0.12.0")
+implementation("io.cloudx:sdk:2.0.0")
 // Optional adapters
-implementation("io.cloudx:adapter-cloudx:0.12.0")
-implementation("io.cloudx:adapter-meta:0.12.0")
-implementation("io.cloudx:adapter-vungle:0.12.0")
+implementation("io.cloudx:adapter-cloudx:2.0.0")
+implementation("io.cloudx:adapter-meta:2.0.0")       // Meta Audience Network 6.21.0
+implementation("io.cloudx:adapter-vungle:2.0.0")     // Vungle SDK 7.6.1
+implementation("io.cloudx:adapter-inmobi:2.0.0")     // InMobi SDK 11.1.0
 ```
 
 Then sync Gradle.
@@ -181,24 +196,42 @@ object : CloudXAdViewListener {
 
 **Fix:** Check for conflicting AndroidManifest.xml entries. CloudX SDK handles its own manifest entries.
 
-### Error: "Unresolved reference: CloudXPrivacy" or "effectiveMessage"
+### Error: "Unresolved reference: CloudXPrivacy" or "effectiveMessage" or "CloudXInitializationParams"
 
-**Fix:** These APIs were removed in v0.12.0. Update code:
+**Fix:** These APIs were removed. Update code:
 ```kotlin
 // OLD (v0.11.0 and earlier)
 CloudX.setPrivacy(CloudXPrivacy(isUserConsent = true))
 Log.e("Error", error.effectiveMessage)
 CloudX.setLoggingEnabled(false)
 
-// NEW (v0.12.0+)
+// NEW (v2.0.0+)
 // Privacy handled automatically via IAB strings - no code needed
 Log.e("Error", error.message)
 CloudX.setMinLogLevel(CloudXLogLevel.NONE)
+
+// OLD (v0.12.0)
+val params = CloudXInitializationParams(appKey = "key", testMode = true)
+CloudX.initialize(params, listener)
+
+// NEW (v2.0.0+)
+CloudX.initialize(
+    CloudXInitializationConfiguration.builder("key").build(),
+    listener
+)
+
+// OLD (v0.12.0)
+val rewarded = CloudX.createRewardedInterstitial("placement")
+rewarded.show()
+
+// NEW (v2.0.0+)
+val rewarded = CloudX.createRewarded("ad-unit-id")
+rewarded.show(activity)
 ```
 
 ### Error: ProGuard/R8 obfuscation issues
 
-**Fix:** No special rules needed for v0.12.0. SDK handles consumer proguard rules automatically. If issues persist:
+**Fix:** No special rules needed for v2.0.0. SDK handles consumer proguard rules automatically. If issues persist:
 ```proguard
 -keep class io.cloudx.sdk.** { *; }
 ```
