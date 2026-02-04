@@ -4,11 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Purpose
 
-This repository contains specialized Claude Code agents for automating CloudX SDK integration across multiple platforms (Android, Flutter, and future iOS). The agents help app publishers integrate CloudX SDK as a primary ad mediation layer with proper fallback to AdMob/AppLovin, reducing integration time from 4-6 hours to ~20 minutes.
+This repository contains specialized Claude Code agents for automating CloudX SDK integration across multiple platforms (Android and future iOS, Unity). The agents help app publishers integrate CloudX SDK as a primary ad mediation layer with proper fallback to AdMob/AppLovin, reducing integration time from 4-6 hours to ~20 minutes.
 
 **Supported Platforms:**
 - **Android** (v0.8.0) - 4 agents - Production ready
-- **Flutter** (v0.1.2) - 4 agents - Production ready
 - **iOS** - Coming soon
 
 ## Architecture Overview
@@ -25,15 +24,11 @@ User/Main Agent (Coordinator)
     │    ├── @agent-cloudx-android-build-verifier (Testing)
     │    └── @agent-cloudx-android-privacy-checker (Compliance)
     │
-    └──► Flutter Agents
-         ├── @agent-cloudx-flutter-integrator     (Implementation)
-         ├── @agent-cloudx-flutter-auditor        (Validation)
-         ├── @agent-cloudx-flutter-build-verifier (Testing)
-         └── @agent-cloudx-flutter-privacy-checker (Compliance)
+    └──► [Future Platforms: iOS, Unity, etc.]
 ```
 
 **Agent Definitions**: All agents are defined as markdown files in `.claude/agents/<platform>/` with frontmatter specifying:
-- `name`: Agent identifier (e.g., `cloudx-flutter-integrator`) that maps to Claude invocation `@agent-cloudx-flutter-integrator`
+- `name`: Agent identifier (e.g., `cloudx-android-integrator`) that maps to Claude invocation `@agent-cloudx-android-integrator`
 - `description`: When to invoke the agent (critical for auto-routing)
 - `tools`: Available tools (Read, Write, Edit, Grep, Glob, Bash)
 - `model`: Preferred model (sonnet, haiku, opus)
@@ -47,19 +42,8 @@ User/Main Agent (Coordinator)
      - `cloudx-android-build-verifier.md` → `@agent-cloudx-android-build-verifier` (runs Gradle builds and reports errors)
      - `cloudx-android-privacy-checker.md` → `@agent-cloudx-android-privacy-checker` (validates GDPR/CCPA/COPPA compliance)
 
-   - **Flutter** (`.claude/agents/flutter/`)
-     - `cloudx-flutter-integrator.md` → `@agent-cloudx-flutter-integrator` (implements SDK integration with fallback logic)
-     - `cloudx-flutter-auditor.md` → `@agent-cloudx-flutter-auditor` (validates that existing fallback paths remain intact)
-     - `cloudx-flutter-build-verifier.md` → `@agent-cloudx-flutter-build-verifier` (runs Flutter builds and reports errors)
-     - `cloudx-flutter-privacy-checker.md` → `@agent-cloudx-flutter-privacy-checker` (validates GDPR/CCPA/COPPA compliance)
-
 2. **Documentation** (`docs/<platform>/`)
    - **Android** (`docs/android/`)
-     - `SETUP.md` - Installation and setup instructions
-     - `INTEGRATION_GUIDE.md` - Complete integration guide with examples
-     - `ORCHESTRATION.md` - Agent coordination and workflow patterns
-
-   - **Flutter** (`docs/flutter/`)
      - `SETUP.md` - Installation and setup instructions
      - `INTEGRATION_GUIDE.md` - Complete integration guide with examples
      - `ORCHESTRATION.md` - Agent coordination and workflow patterns
@@ -69,8 +53,6 @@ User/Main Agent (Coordinator)
    - **Android** (`scripts/android/`)
      - `validate_agent_apis.sh` - Validates agent documentation matches SDK version
      - `check_api_coverage.sh` - Checks API documentation coverage
-   - **Flutter** (`scripts/flutter/`)
-     - `validate_agent_apis.sh` - Validates agent documentation matches SDK version
 
 4. **SDK Version Tracking** (`SDK_VERSION.yaml`)
    - Tracks which CloudX SDK version the agents are synchronized with (per platform)
@@ -85,7 +67,7 @@ The agents implement a "first look" pattern where CloudX SDK is tried first, wit
 ```
 CloudX SDK (Primary - First Look)
     │
-    │ onAdLoadFailed (Android/Flutter)
+    │ onAdLoadFailed
     ▼
 Secondary Mediation (Fallback)
     ├── Google AdMob
@@ -368,18 +350,25 @@ The agents must stay synchronized with CloudX SDK public APIs. When SDK version 
 ```
 cloudx-sdk-agents/
 ├── .claude/
-│   └── agents/                    # Agent definitions (markdown files)
+│   └── agents/
+│       └── <platform>/            # Platform-specific agent definitions
+│           ├── cloudx-<platform>-integrator.md
+│           ├── cloudx-<platform>-auditor.md
+│           ├── cloudx-<platform>-build-verifier.md
+│           └── cloudx-<platform>-privacy-checker.md
 ├── .github/
 │   └── workflows/                 # CI/CD workflows
 ├── docs/
-│   ├── SETUP.md                   # Installation guide
-│   ├── INTEGRATION_GUIDE.md       # Complete integration guide
-│   └── ORCHESTRATION.md           # Agent coordination guide
+│   └── <platform>/                # Platform-specific documentation
+│       ├── SETUP.md
+│       ├── INTEGRATION_GUIDE.md
+│       └── ORCHESTRATION.md
 ├── scripts/
-│   ├── install.sh                 # Agent installer
-│   ├── validate_agent_apis.sh     # API validation script
-│   └── check_api_coverage.sh      # Coverage checker
-├── SDK_VERSION.yaml               # SDK version tracking
+│   ├── install.sh                 # Multi-platform agent installer
+│   └── <platform>/                # Platform-specific scripts
+│       ├── validate_agent_apis.sh
+│       └── check_api_coverage.sh
+├── SDK_VERSION.yaml               # SDK version tracking (per platform)
 └── README.md                      # Quick start guide
 ```
 
