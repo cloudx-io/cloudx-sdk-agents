@@ -6,7 +6,7 @@ model: sonnet
 ---
 
 # CloudX Android Audit Agent
-**SDK Version:** 0.12.0 | **Last Updated:** 2025-12-15
+**SDK Version:** 2.0.0 | **Last Updated:** 2026-02-04
 
 Audit CloudX implementation: correct API usage, CloudX as primary, fallback intact.
 
@@ -14,7 +14,7 @@ Audit CloudX implementation: correct API usage, CloudX as primary, fallback inta
 
 ### 1. Initialization
 - CloudX.initialize() in Application.onCreate()
-- CloudXInitializationParams configured (appKey, testMode)
+- CloudXInitializationConfiguration builder pattern used
 - CloudXInitializationListener handles success/failure
 - Application registered in AndroidManifest.xml
 
@@ -37,35 +37,34 @@ For each format verify:
 
 **Banner/MREC:**
 ```kotlin
-val banner = CloudX.createBanner("placement") // or createMREC
+val banner = CloudX.createBanner("ad-unit-id") // or createMREC
 banner.listener = object : CloudXAdViewListener { /* all methods */ }
 container.addView(banner)
-banner.load()
-banner.startAutoRefresh() // optional
+// Auto-loads and auto-refreshes - no need to call load()
 banner.destroy() // in onDestroy()
 ```
 
 **Interstitial:**
 ```kotlin
-val interstitial = CloudX.createInterstitial("placement")
+val interstitial = CloudX.createInterstitial("ad-unit-id")
 interstitial.listener = object : CloudXInterstitialListener { /* all methods */ }
 interstitial.load()
 if (interstitial.isAdReady) {
-    interstitial.show()
+    interstitial.show(activity)  // Pass Activity
 }
 interstitial.destroy() // in onDestroy()
 ```
 
 **Rewarded:**
 ```kotlin
-val rewarded = CloudX.createRewardedInterstitial("placement")
-rewarded.listener = object : CloudXRewardedInterstitialListener {
-    override fun onUserRewarded(ad: CloudXAd) { /* grant reward */ }
+val rewarded = CloudX.createRewarded("ad-unit-id")
+rewarded.listener = object : CloudXRewardedListener {
+    override fun onUserRewarded(ad: CloudXAd, reward: CloudXReward) { /* grant reward */ }
     /* other methods */
 }
 rewarded.load()
 if (rewarded.isAdReady) {
-    rewarded.show()
+    rewarded.show(activity)  // Pass Activity
 }
 rewarded.destroy() // in onDestroy()
 ```
@@ -91,6 +90,9 @@ grep -r "\.destroy()" --include="*.kt" --include="*.java"
 // - IABUSPrivacy_String (CCPA legacy)
 // - IABGPP_HDR_GppString, IABGPP_GppSID (GPP modern)
 // No manual privacy calls needed
+
+// For GDPR (EU): SDK checks TCF v2 consent for purposes 1-4
+// and vendor consent (CloudX Vendor ID: 1510)
 ```
 
 **Verify CMP integration:**
@@ -116,51 +118,57 @@ Verify all APIs used correctly:
 
 | API | Correct Usage | Common Mistake |
 |-----|---------------|----------------|
-| `initialize()` | In Application.onCreate() | In Activity |
+| `initialize()` | In Application.onCreate() with builder | In Activity |
 | `createBanner()` | Returns CloudXAdView | Not added to layout |
-| `load()` | After setting listener | Before setting listener |
-| `show()` | Check isAdReady first | Call without checking |
+| `show()` | Pass Activity, check isAdReady first | Call without Activity or checking |
 | `destroy()` | In onDestroy() | Never called |
-| `startAutoRefresh()` | For banner/MREC | For interstitial/rewarded |
+| `startAutoRefresh()` | For banner/MREC (optional) | For interstitial/rewarded |
 | `setMinLogLevel()` | Use CloudXLogLevel.NONE to disable | Using deprecated setLoggingEnabled() |
+| `createBanner()` | Use ad unit ID | Using placement name |
 
-**Complete API List (v0.12.0):**
+**Complete API List (v2.0.0):**
 
 Core SDK:
-- `CloudX.initialize(CloudXInitializationParams, CloudXInitializationListener?)`
-- `CloudX.createBanner(String): CloudXAdView`
-- `CloudX.createMREC(String): CloudXAdView`
-- `CloudX.createInterstitial(String): CloudXInterstitialAd`
-- `CloudX.createRewardedInterstitial(String): CloudXRewardedInterstitialAd`
+- `CloudX.initialize(CloudXInitializationConfiguration, CloudXInitializationListener?)`
+- `CloudX.createBanner(String adUnitId): CloudXAdView`
+- `CloudX.createMREC(String adUnitId): CloudXAdView`
+- `CloudX.createInterstitial(String adUnitId): CloudXInterstitialAd`
+- `CloudX.createRewarded(String adUnitId): CloudXRewardedAd`
 - `CloudX.setMinLogLevel(CloudXLogLevel)`
 - `CloudX.setHashedUserId(String)`
 - `CloudX.setUserKeyValue(String, String)`
 - `CloudX.setAppKeyValue(String, String)`
 - `CloudX.clearAllKeyValues()`
-- `CloudX.deinitialize()`
 
 Ad Views:
-- `CloudXAdView.load()`
+- `CloudXAdView.setPlacement(String)`
+- `CloudXAdView.setCustomData(String)`
 - `CloudXAdView.startAutoRefresh()`
 - `CloudXAdView.stopAutoRefresh()`
 - `CloudXAdView.destroy()`
 - `CloudXAdView.listener: CloudXAdViewListener?`
+- `CloudXAdView.revenueListener: CloudXAdRevenueListener?`
 
 Fullscreen Ads:
-- `CloudXInterstitialAd/CloudXRewardedInterstitialAd.load()`
-- `CloudXInterstitialAd/CloudXRewardedInterstitialAd.show()`
-- `CloudXInterstitialAd/CloudXRewardedInterstitialAd.isAdReady: Boolean`
-- `CloudXInterstitialAd/CloudXRewardedInterstitialAd.destroy()`
-- `CloudXInterstitialAd/CloudXRewardedInterstitialAd.listener`
-- `CloudXInterstitialAd/CloudXRewardedInterstitialAd.revenueListener`
+- `CloudXInterstitialAd/CloudXRewardedAd.load()`
+- `CloudXInterstitialAd/CloudXRewardedAd.show(Activity)`
+- `CloudXInterstitialAd/CloudXRewardedAd.show(Activity, String placement)`
+- `CloudXInterstitialAd/CloudXRewardedAd.show(Activity, String placement, String customData)`
+- `CloudXInterstitialAd/CloudXRewardedAd.isAdReady: Boolean`
+- `CloudXInterstitialAd/CloudXRewardedAd.destroy()`
+- `CloudXInterstitialAd/CloudXRewardedAd.listener`
+- `CloudXInterstitialAd/CloudXRewardedAd.revenueListener`
 
 **Verify no deprecated APIs:**
 ```bash
-# Search for deprecated APIs (removed in v0.12.0)
+# Search for deprecated APIs (removed in v0.12.0+)
 grep -r "CloudXPrivacy\\|setPrivacy\\|effectiveMessage\\|setLoggingEnabled" --include="*.kt" --include="*.java"
 
-# Search for CloudXInitializationServer usage (deprecated)
-grep -r "CloudXInitializationServer\\.Production\\|CloudXInitializationServer\\.Staging" --include="*.kt" --include="*.java"
+# Search for old initialization pattern
+grep -r "CloudXInitializationParams\\|CloudXInitializationServer" --include="*.kt" --include="*.java"
+
+# Search for old rewarded API
+grep -r "createRewardedInterstitial\\|CloudXRewardedInterstitialAd\\|CloudXRewardedInterstitialListener" --include="*.kt" --include="*.java"
 ```
 
 ### 6. Fallback Verification
@@ -170,7 +178,7 @@ Ensure AdMob/AppLovin/IronSource fallback never broken:
 **Pattern to check:**
 ```kotlin
 cloudxAd.listener = object : CloudXAdListener {
-    override fun onAdLoadFailed(error: CloudXError) {
+    override fun onAdLoadFailed(adUnitId: String, error: CloudXError) {
         // Fallback must be here
         loadAdMobAd() // or AppLovin/IronSource
     }
@@ -185,21 +193,22 @@ grep -A3 "onAdLoadFailed" --include="*.kt" --include="*.java"
 
 ### 7. Dependencies Check
 
-**Verify correct dependencies (v0.12.0):**
+**Verify correct dependencies (v2.0.0):**
 ```bash
 grep "io.cloudx:sdk\|io.cloudx:adapter" build.gradle app/build.gradle build.gradle.kts app/build.gradle.kts
 ```
 
 Expected (core SDK required):
 ```gradle
-implementation("io.cloudx:sdk:0.12.0")
+implementation("io.cloudx:sdk:2.0.0")
 ```
 
 Optional adapters (recommended):
 ```gradle
-implementation("io.cloudx:adapter-cloudx:0.12.0")
-implementation("io.cloudx:adapter-meta:0.12.0")
-implementation("io.cloudx:adapter-vungle:0.12.0")
+implementation("io.cloudx:adapter-cloudx:2.0.0")
+implementation("io.cloudx:adapter-meta:2.0.0")       // Meta Audience Network 6.21.0
+implementation("io.cloudx:adapter-vungle:2.0.0")     // Vungle SDK 7.6.1
+implementation("io.cloudx:adapter-inmobi:2.0.0")     // InMobi SDK 11.1.0
 ```
 
 **Verify mavenCentral():**
@@ -209,20 +218,29 @@ grep -r "mavenCentral" settings.gradle settings.gradle.kts
 
 ### 8. Breaking Changes
 
-**v0.11.x to v0.12.0:**
-- Removed `CloudXError.effectiveMessage` - use `message` directly (now non-null)
-- Removed `setLoggingEnabled()` - use `setMinLogLevel(CloudXLogLevel.NONE)` instead
-- Removed `CloudXPrivacy` class - privacy now handled automatically via GPP/TCF
-- Simplified TCF purpose checks to only require purposes 1 and 2
+**v0.12.x to v2.0.0:**
+- Ad unit IDs replace placement names in all `create*()` methods
+- `CloudXInitializationConfiguration.builder()` replaces `CloudXInitializationParams`
+- `CloudXRewardedAd` replaces `CloudXRewardedInterstitialAd`
+- `CloudXRewardedListener` replaces `CloudXRewardedInterstitialListener`
+- `show()` requires `Activity` parameter for fullscreen ads
+- Listener callbacks now include `adUnitId` parameter in `onAdLoadFailed()`
+- `onUserRewarded()` now includes `CloudXReward` parameter
+- `CloudXAd.networkName` replaces `bidderName`
+- `CloudXAd.adUnitId` replaces `placementId`
+- TCF purposes 1-4 required (was 1-2)
+- Banner/MREC auto-load on creation (no need to call `load()`)
 
-**v0.10.x to v0.12.0:**
-- Same breaking changes as above
-- All adapters remain compatible
+**v0.11.x to v2.0.0:**
+- All above changes, plus:
+- Removed `CloudXError.effectiveMessage` - use `message` directly
+- Removed `setLoggingEnabled()` - use `setMinLogLevel(CloudXLogLevel.NONE)`
+- Removed `CloudXPrivacy` class - privacy handled automatically via GPP/TCF
 
 **Verify migration:**
 ```bash
-# Check for removed APIs
-grep -r "effectiveMessage\\|setLoggingEnabled\\|CloudXPrivacy\\|setPrivacy" --include="*.kt" --include="*.java"
+# Check for old APIs
+grep -r "CloudXInitializationParams\\|createRewardedInterstitial\\|CloudXRewardedInterstitialAd\\|effectiveMessage\\|setLoggingEnabled\\|CloudXPrivacy" --include="*.kt" --include="*.java"
 
 # Check SDK version
 grep "io.cloudx:sdk" build.gradle app/build.gradle build.gradle.kts app/build.gradle.kts
@@ -258,16 +276,19 @@ grep -A5 "onAdLoadFailed" --include="*.kt" --include="*.java"
 ## Red Flags
 
 - CloudX initialization in Activity (not Application)
+- Using old initialization pattern (`CloudXInitializationParams`)
+- Using placement names instead of ad unit IDs
+- Using old rewarded API (`createRewardedInterstitial`)
+- `show()` without Activity parameter
+- `show()` without checking isAdReady
 - Using removed APIs (CloudXPrivacy, setPrivacy(), effectiveMessage, setLoggingEnabled())
 - Missing destroy() calls
 - No fallback in onAdLoadFailed()
-- show() without checking isAdReady
-- Hard-coded testMode = true in production
+- Hard-coded test mode in production
 - Missing listener implementations
-- Using deprecated CloudXInitializationServer parameter explicitly
-- Listener set after load() call
+- Listener set after load() call for fullscreen ads
 - Wrong artifact ID (e.g., "cloudx-android-sdk" instead of "sdk")
-- Missing recommended adapter dependencies
+- Missing recommended adapter dependencies (especially adapter-inmobi)
 
 ## Audit Report Template
 
