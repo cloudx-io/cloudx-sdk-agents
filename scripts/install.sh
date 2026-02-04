@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # CloudX SDK - Multi-Platform Agent Installer
-# Installs CloudX integration agents for Claude Code (Android + Flutter)
-# Usage: bash install.sh [--global|--local] [--platform=android|flutter|all] [--yes]
+# Installs CloudX integration agents for Claude Code
+# Usage: bash install.sh [--global|--local] [--platform=android|all] [--yes]
 
 set -e
 
@@ -56,12 +56,12 @@ BASE_URL="https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}
 
 # Validate platform argument
 case $PLATFORM in
-    android|flutter|all)
+    android|all)
         ;;
     *)
         echo -e "${RED}Error: Invalid platform '${PLATFORM}'${NC}"
-        echo "Valid options: android, flutter, all"
-        echo "Usage: bash install.sh [--global|--local] [--platform=android|flutter|all]"
+        echo "Valid options: android, all"
+        echo "Usage: bash install.sh [--global|--local] [--platform=android|all]"
         exit 1
         ;;
 esac
@@ -74,30 +74,19 @@ ANDROID_AGENTS=(
     "cloudx-android-privacy-checker"
 )
 
-# Flutter agent files
-FLUTTER_AGENTS=(
-    "cloudx-flutter-integrator"
-    "cloudx-flutter-auditor"
-    "cloudx-flutter-build-verifier"
-    "cloudx-flutter-privacy-checker"
-)
-
 # Helper functions
 print_header() {
     echo ""
-    echo -e "${BLUE}╔════════════════════════════════════════╗${NC}"
-    echo -e "${BLUE}║  CloudX SDK Agent Installer (Multi-Platform) ║${NC}"
-    echo -e "${BLUE}╚════════════════════════════════════════╝${NC}"
+    echo -e "${BLUE}╔════════════════════════════════════════════════╗${NC}"
+    echo -e "${BLUE}║  CloudX SDK Agent Installer (Multi-Platform)   ║${NC}"
+    echo -e "${BLUE}╚════════════════════════════════════════════════╝${NC}"
     echo ""
     case $PLATFORM in
         android)
             echo -e "  Platform: ${GREEN}Android${NC}"
             ;;
-        flutter)
-            echo -e "  Platform: ${GREEN}Flutter${NC}"
-            ;;
         all)
-            echo -e "  Platform: ${GREEN}All (Android + Flutter)${NC}"
+            echo -e "  Platform: ${GREEN}All Platforms${NC}"
             ;;
     esac
     echo ""
@@ -142,53 +131,11 @@ check_claude_code() {
     fi
 }
 
-# Check if Flutter SDK is installed (recommended for Flutter agents)
-check_flutter_sdk() {
-    # Only check if installing Flutter agents
-    if [ "$PLATFORM" != "flutter" ] && [ "$PLATFORM" != "all" ]; then
-        return 0
-    fi
-
-    if command -v flutter &> /dev/null; then
-        local flutter_version=$(flutter --version 2>&1 | head -n 1)
-        print_success "Flutter SDK detected: $flutter_version"
-        return 0
-    else
-        print_warning "Flutter SDK not detected"
-        echo ""
-        echo "   Flutter agents require Flutter SDK to work properly."
-        echo "   You can install agents now and set up Flutter later, but"
-        echo "   the agents won't be able to build/test your Flutter project."
-        echo ""
-        echo "   Install Flutter SDK:"
-        echo -e "   • Visit: ${BLUE}https://flutter.dev/docs/get-started/install${NC}"
-        echo -e "   • macOS: ${BLUE}brew install --cask flutter${NC}"
-        echo -e "   • Verify: ${BLUE}flutter doctor${NC}"
-        echo ""
-
-        if [ "$NON_INTERACTIVE" = "true" ]; then
-            print_warning "Running in non-interactive mode, continuing anyway..."
-            echo ""
-            return 0
-        fi
-
-        read -p "   Continue installation anyway? (y/N) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            echo ""
-            print_info "Installation cancelled. Install Flutter SDK and try again."
-            exit 0
-        fi
-        echo ""
-        return 0
-    fi
-}
-
 # Download a single agent file
 download_agent() {
     local agent_name=$1
     local target_dir=$2
-    local platform_subdir=$3  # "android" or "flutter"
+    local platform_subdir=$3  # "android"
     local url="${BASE_URL}/.claude/agents/${platform_subdir}/${agent_name}.md"
     local platform_dir="${target_dir}/${platform_subdir}"
     local target_file="${platform_dir}/${agent_name}.md"
@@ -248,23 +195,11 @@ install_global() {
             total_success=$?
             total_agents=${#ANDROID_AGENTS[@]}
             ;;
-        flutter)
-            install_platform_agents "$agent_dir" "flutter" "${FLUTTER_AGENTS[@]}"
-            total_success=$?
-            total_agents=${#FLUTTER_AGENTS[@]}
-            ;;
         all)
             install_platform_agents "$agent_dir" "android" "${ANDROID_AGENTS[@]}"
             local android_success=$?
-            echo ""
-            install_platform_agents "$agent_dir" "flutter" "${FLUTTER_AGENTS[@]}"
-            local flutter_success=$?
-            total_agents=$((${#ANDROID_AGENTS[@]} + ${#FLUTTER_AGENTS[@]}))
-            if [ $android_success -eq 0 ] && [ $flutter_success -eq 0 ]; then
-                total_success=0
-            else
-                total_success=1
-            fi
+            total_agents=${#ANDROID_AGENTS[@]}
+            total_success=$android_success
             ;;
     esac
 
@@ -288,21 +223,10 @@ install_local() {
             install_platform_agents "$agent_dir" "android" "${ANDROID_AGENTS[@]}"
             total_success=$?
             ;;
-        flutter)
-            install_platform_agents "$agent_dir" "flutter" "${FLUTTER_AGENTS[@]}"
-            total_success=$?
-            ;;
         all)
             install_platform_agents "$agent_dir" "android" "${ANDROID_AGENTS[@]}"
             local android_success=$?
-            echo ""
-            install_platform_agents "$agent_dir" "flutter" "${FLUTTER_AGENTS[@]}"
-            local flutter_success=$?
-            if [ $android_success -eq 0 ] && [ $flutter_success -eq 0 ]; then
-                total_success=0
-            else
-                total_success=1
-            fi
+            total_success=$android_success
             ;;
     esac
 
@@ -329,23 +253,10 @@ verify_installation() {
                 fi
             done
             ;;
-        flutter)
-            total_expected=${#FLUTTER_AGENTS[@]}
-            for agent in "${FLUTTER_AGENTS[@]}"; do
-                if [ -f "${agent_dir}/flutter/${agent}.md" ]; then
-                    ((found_count++))
-                fi
-            done
-            ;;
         all)
-            total_expected=$((${#ANDROID_AGENTS[@]} + ${#FLUTTER_AGENTS[@]}))
+            total_expected=${#ANDROID_AGENTS[@]}
             for agent in "${ANDROID_AGENTS[@]}"; do
                 if [ -f "${agent_dir}/android/${agent}.md" ]; then
-                    ((found_count++))
-                fi
-            done
-            for agent in "${FLUTTER_AGENTS[@]}"; do
-                if [ -f "${agent_dir}/flutter/${agent}.md" ]; then
                     ((found_count++))
                 fi
             done
@@ -368,7 +279,7 @@ show_usage() {
     echo "Options:"
     echo "  --local               Install agents to current project's .claude/agents/ (default)"
     echo "  --global              Install agents globally to ~/.claude/agents/"
-    echo "  --platform=PLATFORM   Choose platform: android, flutter, or all (default: all)"
+    echo "  --platform=PLATFORM   Choose platform: android, or all (default: all)"
     echo "  --branch=BRANCH       Install from specific branch (default: main)"
     echo "  --yes, -y             Skip prompts (non-interactive mode, auto-detected in CI)"
     echo "  --non-interactive     Same as --yes"
@@ -379,8 +290,6 @@ show_usage() {
     echo "  bash install.sh --local                   # Install all platforms to current project"
     echo "  bash install.sh --global                  # Install all platforms globally"
     echo "  bash install.sh --platform=android        # Install only Android agents locally"
-    echo "  bash install.sh --platform=flutter        # Install only Flutter agents locally"
-    echo "  bash install.sh --global --platform=flutter  # Install Flutter agents globally"
     echo "  bash install.sh --yes                     # Non-interactive installation"
     echo "  bash install.sh --global --yes            # Non-interactive global installation"
 }
@@ -402,18 +311,9 @@ show_next_steps() {
                 echo "   • ${agent}"
             done
             ;;
-        flutter)
-            for agent in "${FLUTTER_AGENTS[@]}"; do
-                echo "   • ${agent}"
-            done
-            ;;
         all)
             echo "   Android:"
             for agent in "${ANDROID_AGENTS[@]}"; do
-                echo "     • ${agent}"
-            done
-            echo "   Flutter:"
-            for agent in "${FLUTTER_AGENTS[@]}"; do
                 echo "     • ${agent}"
             done
             ;;
@@ -433,10 +333,6 @@ show_next_steps() {
                 echo "1. Navigate to your Android project:"
                 echo -e "   ${BLUE}cd /path/to/your/android/project${NC}"
                 ;;
-            flutter)
-                echo "1. Navigate to your Flutter project:"
-                echo -e "   ${BLUE}cd /path/to/your/flutter/project${NC}"
-                ;;
             all)
                 echo "1. Navigate to your project:"
                 echo -e "   ${BLUE}cd /path/to/your/project${NC}"
@@ -453,12 +349,8 @@ show_next_steps() {
         android)
             echo -e "   ${YELLOW}Use @agent-cloudx-android-integrator to integrate CloudX SDK with app key: YOUR_KEY${NC}"
             ;;
-        flutter)
-            echo -e "   ${YELLOW}Use @agent-cloudx-flutter-integrator to integrate CloudX SDK with app key: YOUR_KEY${NC}"
-            ;;
         all)
             echo -e "   Android: ${YELLOW}Use @agent-cloudx-android-integrator to integrate CloudX SDK${NC}"
-            echo -e "   Flutter: ${YELLOW}Use @agent-cloudx-flutter-integrator to integrate CloudX SDK${NC}"
             ;;
     esac
 
@@ -476,13 +368,8 @@ show_next_steps() {
             echo "   • Setup Guide: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/docs/android/SETUP.md"
             echo "   • Integration Guide: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/docs/android/INTEGRATION_GUIDE.md"
             ;;
-        flutter)
-            echo "   • Setup Guide: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/docs/flutter/SETUP.md"
-            echo "   • Integration Guide: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/docs/flutter/INTEGRATION_GUIDE.md"
-            ;;
         all)
             echo "   • Android: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/docs/android/"
-            echo "   • Flutter: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/docs/flutter/"
             ;;
     esac
     echo "   • Agent Reference: https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/README.md"
@@ -531,9 +418,6 @@ main() {
 
     # Check for Claude Code (required)
     check_claude_code
-
-    # Check for Flutter SDK (recommended for Flutter agents)
-    check_flutter_sdk
 
     echo ""
 

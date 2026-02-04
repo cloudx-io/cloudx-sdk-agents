@@ -9,7 +9,6 @@ Reduce integration time from 4-6 hours to 20 minutes with specialized AI agents 
 | Platform | Status | SDK Version | Agents |
 |----------|--------|-------------|--------|
 | **Android** | ✅ Production | v0.12.0 | 4 agents |
-| **Flutter** | ✅ Production | v0.1.2 | 4 agents |
 | **iOS** | 🚧 Coming Soon | TBD | TBD |
 
 ## Quick Start
@@ -23,9 +22,6 @@ bash <(curl -fsSL https://raw.githubusercontent.com/cloudx-io/cloudx-sdk-agents/
 ```bash
 # Android only
 bash scripts/install.sh --platform=android
-
-# Flutter only
-bash scripts/install.sh --platform=flutter
 ```
 
 ### Use Agents
@@ -35,13 +31,6 @@ bash scripts/install.sh --platform=flutter
 cd your-android-project
 claude
 "Use @agent-cloudx-android-integrator to integrate CloudX SDK with app key: YOUR_KEY"
-```
-
-**Flutter:**
-```bash
-cd your-flutter-project
-claude
-"Use @agent-cloudx-flutter-integrator to integrate CloudX SDK with app key: YOUR_KEY"
 ```
 
 ## Agents by Platform
@@ -54,14 +43,6 @@ claude
 
 [📖 Android Documentation](./docs/android/)
 
-### Flutter Agents
-- **@agent-cloudx-flutter-integrator** - Implements CloudX with AdMob/AppLovin fallback
-- **@agent-cloudx-flutter-auditor** - Validates fallback paths remain intact
-- **@agent-cloudx-flutter-build-verifier** - Runs Flutter builds and catches errors
-- **@agent-cloudx-flutter-privacy-checker** - Validates GDPR/CCPA/COPPA compliance
-
-[📖 Flutter Documentation](./docs/flutter/)
-
 ## Documentation
 
 ### Android
@@ -69,18 +50,12 @@ claude
 - [Integration Guide](./docs/android/INTEGRATION_GUIDE.md)
 - [Orchestration](./docs/android/ORCHESTRATION.md)
 
-### Flutter
-- [Setup Guide](./docs/flutter/SETUP.md)
-- [Integration Guide](./docs/flutter/INTEGRATION_GUIDE.md)
-- [Orchestration](./docs/flutter/ORCHESTRATION.md)
-
 ### General
 - [Guide for Implementing Agents for Other SDKs](./GUIDE_FOR_OTHER_SDKS.md)
 
 ## Resources
 
 - **Android SDK:** https://github.com/cloudx-io/cloudx-android
-- **Flutter SDK:** https://github.com/cloudx-io/cloudx-flutter
 - **Issues:** https://github.com/cloudx-io/cloudx-sdk-agents/issues
 
 ## Key Features
