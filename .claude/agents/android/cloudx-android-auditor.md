@@ -209,7 +209,6 @@ implementation("io.cloudx:adapter-meta:2.2.2")       // Meta Audience Network 6.
 implementation("io.cloudx:adapter-vungle:2.2.2")     // Vungle SDK 7.7.1
 implementation("io.cloudx:adapter-inmobi:2.2.2")     // InMobi SDK 11.1.1
 implementation("io.cloudx:adapter-mintegral:2.2.2")  // Mintegral SDK 17.0.91
-implementation("io.cloudx:adapter-unity:2.2.1")      // Unity Ads SDK 4.17.0
 ```
 
 **Verify mavenCentral():**

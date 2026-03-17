@@ -39,7 +39,6 @@ dependencies {
     implementation("io.cloudx:adapter-vungle:2.2.2")     // Vungle SDK 7.7.1
     implementation("io.cloudx:adapter-inmobi:2.2.2")     // InMobi SDK 11.1.1
     implementation("io.cloudx:adapter-mintegral:2.2.2")  // Mintegral SDK 17.0.91
-    implementation("io.cloudx:adapter-unity:2.2.1")      // Unity Ads SDK 4.17.0
 }
 ```
 SDK is required. Adapters are optional but recommended for maximum fill rate.
@@ -393,7 +392,7 @@ CloudXInitializationConfiguration.builder("app-key")
 ## Testing Checklist
 
 ### Universal Checks (All Modes)
-- [ ] CloudX SDK dependencies added (sdk, adapter-meta, adapter-vungle, adapter-inmobi, adapter-mintegral, adapter-unity)
+- [ ] CloudX SDK dependencies added (sdk, adapter-meta, adapter-vungle, adapter-inmobi, adapter-mintegral)
 - [ ] mavenCentral() repository configured
 - [ ] CloudX.initialize() called in Application.onCreate() with builder pattern
 - [ ] Application class registered in AndroidManifest.xml
