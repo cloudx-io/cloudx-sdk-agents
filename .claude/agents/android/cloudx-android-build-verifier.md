@@ -7,7 +7,7 @@ model: sonnet
 
 # CloudX Android Build Verifier
 
-**SDK Version:** 2.0.0 | **Last Updated:** 2026-02-04
+**SDK Version:** 2.2.2 | **Last Updated:** 2026-03-17
 
 ## Mission
 Verify CloudX SDK integration compiles successfully.
@@ -16,7 +16,7 @@ Verify CloudX SDK integration compiles successfully.
 
 ### 1. Check Dependencies
 
-Verify SDK version in build.gradle matches 2.0.0:
+Verify SDK version in build.gradle matches 2.2.2:
 
 ```bash
 # Check CloudX dependency
@@ -25,15 +25,16 @@ grep "io.cloudx:sdk\|io.cloudx:adapter" app/build.gradle build.gradle.kts app/bu
 
 Expected (minimum):
 ```gradle
-implementation("io.cloudx:sdk:2.0.0")
+implementation("io.cloudx:sdk:2.2.2")
 ```
 
 Optional adapters:
 ```gradle
-implementation("io.cloudx:adapter-cloudx:2.0.0")
-implementation("io.cloudx:adapter-meta:2.0.0")       // Meta Audience Network 6.21.0
-implementation("io.cloudx:adapter-vungle:2.0.0")     // Vungle SDK 7.6.1
-implementation("io.cloudx:adapter-inmobi:2.0.0")     // InMobi SDK 11.1.0
+implementation("io.cloudx:adapter-meta:2.2.2")       // Meta Audience Network 6.20.0
+implementation("io.cloudx:adapter-vungle:2.2.2")     // Vungle SDK 7.7.1
+implementation("io.cloudx:adapter-inmobi:2.2.2")     // InMobi SDK 11.1.1
+implementation("io.cloudx:adapter-mintegral:2.2.2")  // Mintegral SDK 17.0.91
+implementation("io.cloudx:adapter-unity:2.2.1")      // Unity Ads SDK 4.17.0
 ```
 
 **Check for dependency conflicts:**
@@ -89,7 +90,7 @@ Removed/deprecated (should NOT be imported):
 grep -r "CloudX\." --include="*.kt" --include="*.java"
 ```
 
-Verify correct signatures (v2.0.0):
+Verify correct signatures (v2.2.2):
 - `CloudX.initialize(CloudXInitializationConfiguration, CloudXInitializationListener?)`
 - `CloudX.createBanner(String adUnitId): CloudXAdView`
 - `CloudX.createMREC(String adUnitId): CloudXAdView`
@@ -166,12 +167,13 @@ Verify:
 
 **Fix:** Add dependencies:
 ```gradle
-implementation("io.cloudx:sdk:2.0.0")
+implementation("io.cloudx:sdk:2.2.2")
 // Optional adapters
-implementation("io.cloudx:adapter-cloudx:2.0.0")
-implementation("io.cloudx:adapter-meta:2.0.0")       // Meta Audience Network 6.21.0
-implementation("io.cloudx:adapter-vungle:2.0.0")     // Vungle SDK 7.6.1
-implementation("io.cloudx:adapter-inmobi:2.0.0")     // InMobi SDK 11.1.0
+implementation("io.cloudx:adapter-meta:2.2.2")       // Meta Audience Network 6.20.0
+implementation("io.cloudx:adapter-vungle:2.2.2")     // Vungle SDK 7.7.1
+implementation("io.cloudx:adapter-inmobi:2.2.2")     // InMobi SDK 11.1.1
+implementation("io.cloudx:adapter-mintegral:2.2.2")  // Mintegral SDK 17.0.91
+implementation("io.cloudx:adapter-unity:2.2.1")      // Unity Ads SDK 4.17.0
 ```
 
 Then sync Gradle.

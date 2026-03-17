@@ -6,7 +6,7 @@ model: sonnet
 ---
 
 # CloudX Android Audit Agent
-**SDK Version:** 2.0.0 | **Last Updated:** 2026-02-04
+**SDK Version:** 2.2.2 | **Last Updated:** 2026-03-17
 
 Audit CloudX implementation: correct API usage, CloudX as primary, fallback intact.
 
@@ -126,7 +126,7 @@ Verify all APIs used correctly:
 | `setMinLogLevel()` | Use CloudXLogLevel.NONE to disable | Using deprecated setLoggingEnabled() |
 | `createBanner()` | Use ad unit ID | Using placement name |
 
-**Complete API List (v2.0.0):**
+**Complete API List (v2.2.2):**
 
 Core SDK:
 - `CloudX.initialize(CloudXInitializationConfiguration, CloudXInitializationListener?)`
@@ -193,22 +193,23 @@ grep -A3 "onAdLoadFailed" --include="*.kt" --include="*.java"
 
 ### 7. Dependencies Check
 
-**Verify correct dependencies (v2.0.0):**
+**Verify correct dependencies (v2.2.2):**
 ```bash
 grep "io.cloudx:sdk\|io.cloudx:adapter" build.gradle app/build.gradle build.gradle.kts app/build.gradle.kts
 ```
 
 Expected (core SDK required):
 ```gradle
-implementation("io.cloudx:sdk:2.0.0")
+implementation("io.cloudx:sdk:2.2.2")
 ```
 
 Optional adapters (recommended):
 ```gradle
-implementation("io.cloudx:adapter-cloudx:2.0.0")
-implementation("io.cloudx:adapter-meta:2.0.0")       // Meta Audience Network 6.21.0
-implementation("io.cloudx:adapter-vungle:2.0.0")     // Vungle SDK 7.6.1
-implementation("io.cloudx:adapter-inmobi:2.0.0")     // InMobi SDK 11.1.0
+implementation("io.cloudx:adapter-meta:2.2.2")       // Meta Audience Network 6.20.0
+implementation("io.cloudx:adapter-vungle:2.2.2")     // Vungle SDK 7.7.1
+implementation("io.cloudx:adapter-inmobi:2.2.2")     // InMobi SDK 11.1.1
+implementation("io.cloudx:adapter-mintegral:2.2.2")  // Mintegral SDK 17.0.91
+implementation("io.cloudx:adapter-unity:2.2.1")      // Unity Ads SDK 4.17.0
 ```
 
 **Verify mavenCentral():**
