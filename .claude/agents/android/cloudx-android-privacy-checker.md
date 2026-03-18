@@ -6,7 +6,7 @@ model: sonnet
 ---
 
 # CloudX Android Privacy Checker
-**SDK Version:** 2.0.0 | **Last Updated:** 2026-02-04
+**SDK Version:** 2.2.2 | **Last Updated:** 2026-03-17
 
 Ensure GDPR/CCPA/IAB compliance. Research fallback SDK privacy using WebSearch when needed.
 
@@ -122,7 +122,7 @@ grep -r "privacy.*policy\|Privacy.*Policy" --include="*.kt" --include="*.java" -
 
 ### 6. SDK Configuration
 
-**v2.0.0+ (automatic privacy):**
+**v2.2.2+ (automatic privacy):**
 ```kotlin
 // CloudX automatically handles privacy via IAB strings
 // No manual configuration needed - SDK reads from SharedPreferences
@@ -216,7 +216,7 @@ grep -r "onAdLoadFailed" -A10 --include="*.kt" --include="*.java" | grep -i "con
 - [ ] CMP integration present (writes IAB strings to SharedPreferences)
 - [ ] GDPR consent dialog for EU users
 - [ ] CCPA opt-out mechanism for California users
-- [ ] CloudX SDK v2.0.0 (automatic privacy handling)
+- [ ] CloudX SDK v2.2.2 (automatic privacy handling)
 - [ ] No usage of removed APIs (CloudXPrivacy, setPrivacy)
 - [ ] Privacy policy exists and mentions CloudX
 - [ ] User can withdraw consent
@@ -233,7 +233,7 @@ After validation:
 - CCPA: [Compliant / Non-compliant]
 - IAB TCF/GPP: [Present / Not detected / N/A]
 - Privacy Policy: [Present / Missing]
-- SDK Version: [v2.0.0 (automatic) / v0.11.0 or earlier (manual)]
+- SDK Version: [v2.2.2 (automatic) / v0.11.0 or earlier (manual)]
 
 ### Implementation
 - CMP integration: [Present / Missing]

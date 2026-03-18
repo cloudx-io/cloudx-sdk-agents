@@ -8,7 +8,7 @@ Reduce integration time from 4-6 hours to 20 minutes with specialized AI agents 
 
 | Platform | Status | SDK Version | Agents |
 |----------|--------|-------------|--------|
-| **Android** | ✅ Production | v2.0.0 | 4 agents |
+| **Android** | ✅ Production | v2.2.2 | 4 agents |
 | **iOS** | 🚧 Coming Soon | TBD | TBD |
 
 ## Quick Start

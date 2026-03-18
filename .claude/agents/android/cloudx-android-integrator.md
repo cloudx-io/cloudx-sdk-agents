@@ -6,7 +6,7 @@ model: sonnet
 ---
 
 # CloudX Android Integration Agent
-**SDK Version:** 2.0.0 | **Last Updated:** 2026-02-04
+**SDK Version:** 2.2.2 | **Last Updated:** 2026-03-17
 
 Implement CloudX as primary with fallback to AdMob/AppLovin/IronSource. Research fallback using WebSearch when needed.
 
@@ -32,13 +32,13 @@ Add to app/build.gradle.kts:
 ```gradle
 dependencies {
     // CloudX Core SDK
-    implementation("io.cloudx:sdk:2.0.0")
+    implementation("io.cloudx:sdk:2.2.2")
 
     // Optional: CloudX Adapters (add as needed)
-    implementation("io.cloudx:adapter-cloudx:2.0.0")
-    implementation("io.cloudx:adapter-meta:2.0.0")       // Meta Audience Network 6.21.0
-    implementation("io.cloudx:adapter-vungle:2.0.0")     // Vungle SDK 7.6.1
-    implementation("io.cloudx:adapter-inmobi:2.0.0")     // InMobi SDK 11.1.0
+    implementation("io.cloudx:adapter-meta:2.2.2")       // Meta Audience Network 6.20.0
+    implementation("io.cloudx:adapter-vungle:2.2.2")     // Vungle SDK 7.7.1
+    implementation("io.cloudx:adapter-inmobi:2.2.2")     // InMobi SDK 11.1.1
+    implementation("io.cloudx:adapter-mintegral:2.2.2")  // Mintegral SDK 17.0.91
 }
 ```
 SDK is required. Adapters are optional but recommended for maximum fill rate.
@@ -392,7 +392,7 @@ CloudXInitializationConfiguration.builder("app-key")
 ## Testing Checklist
 
 ### Universal Checks (All Modes)
-- [ ] CloudX SDK dependencies added (sdk, adapter-cloudx, adapter-meta, adapter-vungle, adapter-inmobi)
+- [ ] CloudX SDK dependencies added (sdk, adapter-meta, adapter-vungle, adapter-inmobi, adapter-mintegral)
 - [ ] mavenCentral() repository configured
 - [ ] CloudX.initialize() called in Application.onCreate() with builder pattern
 - [ ] Application class registered in AndroidManifest.xml
@@ -428,7 +428,7 @@ Example:
 ```
 [Brief summary of what was implemented]
 Example:
-- Integrated CloudX SDK v2.0.0
+- Integrated CloudX SDK v2.2.2
 - Implemented Banner, Interstitial, and Rewarded ads
 - Added fallback to AdMob
 - Privacy compliance: IAB TCF/GPP automatically handled
