@@ -1,0 +1,15 @@
+{
+  "name": "cloudx",
+  "description": "CloudX SDK integration agents: docs-backed skills and field playbooks for publisher apps.",
+  "owner": {
+    "name": "CloudX",
+    "url": "https://cloudx.io"
+  },
+  "plugins": [
+    {
+      "name": "cloudx",
+      "source": "./",
+      "description": "Integrate and audit the CloudX SDK in publisher apps. Facts are fetched live from docs.cloudx.io; this plugin ships the workflow and real-world install playbooks."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "cloudx",
+  "description": "Integrate and audit the CloudX SDK in publisher apps. Facts are fetched live from docs.cloudx.io; this plugin ships the workflow and real-world install playbooks.",
+  "version": "2.0.0",
+  "author": {
+    "name": "CloudX",
+    "url": "https://cloudx.io"
+  },
+  "homepage": "https://github.com/cloudx-io/cloudx-sdk-agents",
+  "repository": "https://github.com/cloudx-io/cloudx-sdk-agents",
+  "keywords": ["cloudx", "ads", "mediation", "sdk-integration", "android", "ios", "react-native", "flutter", "unity"],
+  "skills": ["./.agents/skills/cloudx-integrate", "./.agents/skills/cloudx-audit"]
+}

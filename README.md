@@ -1,80 +1,87 @@
-# CloudX SDK - Claude Code Agents (Multi-Platform)
+# CloudX SDK Agents
 
-Automated CloudX SDK integration in ~20 minutes with AI-powered agents.
+AI-agent guidance for integrating the [CloudX SDK](https://docs.cloudx.io) into
+publisher apps — Android, iOS, React Native, Flutter, and Unity. Works with
+Claude Code, Codex, Cursor, and any agent that can read files and fetch URLs.
 
-Reduce integration time from 4-6 hours to 20 minutes with specialized AI agents that handle boilerplate code, implement fallback logic, and validate compliance.
+**How it stays accurate:** this repository contains no SDK versions, no API
+references, and no dependency coordinates. Agents fetch all facts live from
+[docs.cloudx.io](https://docs.cloudx.io) (machine-readable index at
+[`/llms.txt`](https://docs.cloudx.io/llms.txt)), which is updated with every
+SDK release. What lives here is the part docs can't hold: the integration
+**workflow** and **playbooks** for real-world situations — running CloudX
+first-look or parallel alongside an existing mediator (AppLovin MAX, LevelPlay,
+Google, or another), CMP/consent handling, build-system quirks, and mediation
+migrations. CI fails any commit that hardcodes a version.
 
-## Supported Platforms
+## Install
 
-| Platform | Status | SDK Version | Agents |
-|----------|--------|-------------|--------|
-| **Android** | ✅ Production | v2.2.2 | 4 agents |
-| **iOS** | 🚧 Coming Soon | TBD | TBD |
+### Claude Code (recommended)
 
-## Quick Start
-
-### Install All Agents
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/cloudx-io/cloudx-sdk-agents/main/scripts/install.sh)
+```
+/plugin marketplace add cloudx-io/cloudx-sdk-agents
+/plugin install cloudx@cloudx
 ```
 
-### Install Platform-Specific Agents
+Then, in your app project:
+
+> integrate CloudX with app key YOUR_APP_KEY
+
+### Cursor / Codex / other agents
+
+Clone this repo (or vendor `AGENTS.md`, `.agents/skills/`, and `playbooks/`
+into your app repo). `AGENTS.md` is the entry point; both tools pick it up
+natively. Vendored copies stay safe when old — they contain no facts, only the
+instruction to fetch facts live.
+
+### No install
+
+Paste into any agent with web access:
+
+> Follow https://raw.githubusercontent.com/cloudx-io/cloudx-sdk-agents/main/.agents/skills/cloudx-integrate/SKILL.md
+> to integrate the CloudX SDK into this project.
+
+## What's included
+
+| Piece | Purpose |
+|---|---|
+| `cloudx-integrate` skill | Phased integration workflow: Detect → Plan → Integrate → Build-verify → Audit → Report |
+| `cloudx-audit` skill | Check an existing CloudX integration against the current docs |
+| `playbooks/` | Field knowledge: mediator coexistence (first-look / parallel, any mediator), mediation migration, consent & CMPs, Android/iOS/Unity/RN/Flutter build quirks |
+
+Platform status: docs-driven integration works for all five platforms.
+Scenario and native-platform playbooks are seeded with general guidance;
+wrapper-platform playbooks (Unity, React Native, Flutter) start as stubs.
+All grow and harden as real support cases surface.
+
+## Migrating from v1
+
+The previous generation of this repo shipped four Android subagents
+(`@agent-cloudx-android-integrator`, `-auditor`, `-build-verifier`,
+`-privacy-checker`) installed by a curl script into `.claude/agents/`. Those
+files embed an API snapshot that is now two major SDK versions old and
+generates code that no longer compiles. If you installed them:
+
 ```bash
-# Android only
-bash scripts/install.sh --platform=android
+bash scripts/uninstall-legacy.sh
 ```
 
-### Use Agents
+then install the plugin as above. Old invocations map to plain phrases:
+"integrate CloudX" (integrator / build-verifier / privacy-checker) and
+"audit my CloudX integration" (auditor). The v1 tree is preserved at the
+`v1-legacy` tag.
 
-**Android:**
-```bash
-cd your-android-project
-claude
-"Use @agent-cloudx-android-integrator to integrate CloudX SDK with app key: YOUR_KEY"
-```
+## Contributing playbooks
 
-## Agents by Platform
-
-### Android Agents
-- **@agent-cloudx-android-integrator** - Implements CloudX with AdMob/AppLovin fallback
-- **@agent-cloudx-android-auditor** - Validates fallback paths remain intact
-- **@agent-cloudx-android-build-verifier** - Runs Gradle builds and catches errors
-- **@agent-cloudx-android-privacy-checker** - Validates GDPR/CCPA/COPPA compliance
-
-[📖 Android Documentation](./docs/android/)
-
-## Documentation
-
-### Android
-- [Setup Guide](./docs/android/SETUP.md)
-- [Integration Guide](./docs/android/INTEGRATION_GUIDE.md)
-- [Orchestration](./docs/android/ORCHESTRATION.md)
-
-### General
-- [Guide for Implementing Agents for Other SDKs](./GUIDE_FOR_OTHER_SDKS.md)
+Playbooks hold only knowledge absent from [docs.cloudx.io](https://docs.cloudx.io):
+link docs pages instead of restating them, and never include version numbers
+(CI enforces this). Each playbook declares `applies_to`, detection `signals`,
+and `last_verified` frontmatter. Run `scripts/verify.sh` locally before opening
+a PR.
 
 ## Resources
 
-- **Android SDK:** https://github.com/cloudx-io/cloudx-android
-- **Issues:** https://github.com/cloudx-io/cloudx-sdk-agents/issues
-
-## Key Features
-
-- ✅ **Fast Integration** - 20 minutes vs. 4-6 hours manual
-- ✅ **Fallback Logic** - Automatic fallback to AdMob/AppLovin
-- ✅ **Privacy Compliance** - GDPR, CCPA, COPPA validation
-- ✅ **Build Verification** - Catches errors before runtime
-- ✅ **Best Practices** - Implements recommended patterns automatically
-
-## How It Works
-
-1. **Install agents** - One-line installer for your platform
-2. **Invoke integrator** - AI agent implements SDK with fallback
-3. **Validate** - Auditor checks fallback paths are intact
-4. **Build** - Build verifier catches compilation errors
-5. **Check privacy** - Privacy checker validates compliance
-6. **Ship** - Production-ready integration in ~20 minutes
-
-## Contributing
-
-See [GUIDE_FOR_OTHER_SDKS.md](./GUIDE_FOR_OTHER_SDKS.md) for implementing agents for iOS, Unity, React Native, or other platforms.
+- Documentation: https://docs.cloudx.io
+- CloudX MCP server (reporting + docs search in your agent): https://docs.cloudx.io/en/mcp/installation.md
+- Dashboard: https://app.cloudx.io
+- Issues: https://github.com/cloudx-io/cloudx-sdk-agents/issues

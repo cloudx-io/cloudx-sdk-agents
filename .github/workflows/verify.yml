@@ -1,0 +1,19 @@
+name: verify
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    # Weekly heartbeat: the repo sits untouched by design, so external drift
+    # (docs restructuring) must surface without commits.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run repository checks
+        run: bash scripts/verify.sh
