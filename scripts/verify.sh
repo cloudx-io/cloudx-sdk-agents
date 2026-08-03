@@ -14,14 +14,15 @@ warn() { printf 'WARN: %s\n' "$*"; WARN=$((WARN + 1)); }
 
 # --- 1. Docs link check -------------------------------------------------------
 note "== docs link check"
-LLMS_TXT="$(curl -sf --max-time 30 https://docs.cloudx.io/llms.txt)" \
+CURL="curl -sf --max-time 30 --retry 2 --retry-all-errors"
+LLMS_TXT="$($CURL https://docs.cloudx.io/llms.txt)" \
   || { fail "could not fetch https://docs.cloudx.io/llms.txt"; LLMS_TXT=""; }
 
 # Every docs.cloudx.io URL mentioned anywhere in the repo must resolve.
 URLS=$(grep -rhoE 'https://docs\.cloudx\.io[^) `"'"'"'<>]*' \
   --include='*.md' --include='*.json' . | sed 's/[.,;]$//' | sort -u)
 for url in $URLS; do
-  if ! curl -sf -o /dev/null --max-time 30 "$url"; then
+  if ! $CURL -o /dev/null "$url"; then
     fail "dead link: $url"
   fi
 done
@@ -67,6 +68,7 @@ done
 note "== playbook staleness (last_verified > 180 days -> warning)"
 NOW=$(date +%s)
 for f in playbooks/*.md; do
+  [ -f "$f" ] || { fail "no playbook files found in playbooks/"; break; }
   LV=$(sed -n 's/^last_verified: *//p' "$f" | head -1)
   if [ -z "$LV" ]; then
     fail "$f: missing last_verified frontmatter"
