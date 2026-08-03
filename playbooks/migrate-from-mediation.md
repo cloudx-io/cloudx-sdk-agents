@@ -16,8 +16,8 @@ CloudX*, not *delete my mediation today*. Recommend the staged path unless the
 user explicitly confirms removal:
 
 1. **Stage 1 — coexist:** integrate CloudX first-look with the existing stack
-   as fallback (see the matching `coexist-*` playbook and the platform's
-   first-look docs page). Run both, compare in the dashboard.
+   as fallback (see `coexist-mediation.md` and the platform's first-look docs
+   page). Run both, compare in the dashboard.
 2. **Stage 2 — remove:** once the publisher is satisfied, strip the old stack.
 
 Jumping straight to stage 2 forfeits the revenue comparison and makes any

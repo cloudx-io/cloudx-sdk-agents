@@ -29,9 +29,10 @@ Fetch first, always.
 - `.agents/skills/cloudx-audit/` — standalone audit of an existing CloudX
   integration.
 - `playbooks/` — field knowledge the docs site does not cover: coexisting with
-  AppLovin MAX / LevelPlay / Google mediation, migrating off a mediation stack,
-  CMP/consent handling, and per-platform build-system quirks. Load only the
-  playbooks whose signals match the project.
+  an existing mediation stack (AppLovin MAX, LevelPlay, Google, or another —
+  first-look or parallel), migrating off a mediation stack, CMP/consent
+  handling, and per-platform build-system quirks. Load only the playbooks
+  whose signals match the project.
 
 ## For agent tooling maintainers
 

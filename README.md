@@ -9,9 +9,10 @@ references, and no dependency coordinates. Agents fetch all facts live from
 [docs.cloudx.io](https://docs.cloudx.io) (machine-readable index at
 [`/llms.txt`](https://docs.cloudx.io/llms.txt)), which is updated with every
 SDK release. What lives here is the part docs can't hold: the integration
-**workflow** and **playbooks** for real-world situations — coexisting with
-AppLovin MAX or LevelPlay, CMP/consent handling, build-system quirks, and
-mediation migrations. CI fails any commit that hardcodes a version.
+**workflow** and **playbooks** for real-world situations — running CloudX
+first-look or parallel alongside an existing mediator (AppLovin MAX, LevelPlay,
+Google, or another), CMP/consent handling, build-system quirks, and mediation
+migrations. CI fails any commit that hardcodes a version.
 
 ## Install
 
@@ -46,12 +47,12 @@ Paste into any agent with web access:
 |---|---|
 | `cloudx-integrate` skill | Phased integration workflow: Detect → Plan → Integrate → Build-verify → Audit → Report |
 | `cloudx-audit` skill | Check an existing CloudX integration against the current docs |
-| `playbooks/` | Field knowledge: MAX/LevelPlay/Google coexistence, mediation migration, consent & CMPs, Android/iOS/Unity/RN/Flutter build quirks |
+| `playbooks/` | Field knowledge: mediator coexistence (first-look / parallel, any mediator), mediation migration, consent & CMPs, Android/iOS/Unity/RN/Flutter build quirks |
 
 Platform status: docs-driven integration works for all five platforms.
-Playbooks are seeded from real cases for Android and iOS scenarios; wrapper
-platform playbooks (Unity, React Native, Flutter) start as stubs and grow as
-support cases surface.
+Scenario and native-platform playbooks are seeded with general guidance;
+wrapper-platform playbooks (Unity, React Native, Flutter) start as stubs.
+All grow and harden as real support cases surface.
 
 ## Migrating from v1
 

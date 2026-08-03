@@ -31,7 +31,7 @@ and still be wrong or incomplete; the platform changelog page shows what changed
    - Removed/renamed APIs still referenced (changelog is the evidence).
 4. **Coexistence** — if another mediation stack is present: both init paths
    intact, fallback or first-look wiring per the platform's first-look docs
-   page, no circular loading, per the matching `coexist-*` playbook.
+   page, no circular loading, per `coexist-mediation.md`.
 5. **Privacy** — CMP writes IAB consent strings before ads load; no usage of
    privacy APIs the changelog marks removed; consent forwarded to any
    coexisting mediation SDK (per `consent-and-cmp.md`).
