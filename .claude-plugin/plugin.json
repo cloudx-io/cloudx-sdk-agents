@@ -8,6 +8,20 @@
   },
   "homepage": "https://github.com/cloudx-io/cloudx-sdk-agents",
   "repository": "https://github.com/cloudx-io/cloudx-sdk-agents",
-  "keywords": ["cloudx", "ads", "mediation", "sdk-integration", "android", "ios", "react-native", "flutter", "unity"],
-  "skills": ["./.agents/skills/cloudx-integrate", "./.agents/skills/cloudx-audit"]
+  "keywords": [
+    "cloudx",
+    "ads",
+    "mediation",
+    "sdk-integration",
+    "android",
+    "ios",
+    "react-native",
+    "flutter",
+    "unity"
+  ],
+  "skills": [
+    "./.agents/skills/cloudx-integrate",
+    "./.agents/skills/cloudx-audit"
+  ],
+  "license": "MIT"
 }
