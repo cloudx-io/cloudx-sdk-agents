@@ -49,12 +49,20 @@ Identify, from the project's files:
 ### Phase 2 — Plan
 
 1. Fetch `https://docs.cloudx.io/llms.txt`.
-2. Fetch the platform's integration overview page, the pages for each ad format
+2. Establish the adapter set. The correct list is **the networks enabled for
+   this app in the publisher's CloudX dashboard configuration** — adapters are
+   activated by the server-provisioned config at runtime, so an adapter for a
+   network that isn't enabled server-side is dead weight, and an enabled
+   network with no adapter in the binary silently contributes nothing. Ask the
+   publisher which networks are enabled (or read their config via the CloudX
+   MCP/CLI `config/show` if they have it set up). Never guess and never
+   default to "all".
+3. Fetch the platform's integration overview page, the pages for each ad format
    the user wants (default: ask, or start with the formats the app already
-   shows), and the adapter overview pages for networks the user wants enabled.
+   shows), and the adapter overview page for every network in the adapter set.
    `references/doc-map.md` explains which page stems answer which questions.
-3. Read the playbooks selected in Detect.
-4. Present a short plan: dependencies to add, files to create/modify, formats to
+4. Read the playbooks selected in Detect.
+5. Present a short plan: dependencies to add, files to create/modify, formats to
    implement, playbook considerations. Confirm with the user if anything is
    ambiguous (formats, networks, coexistence vs replacement intent).
 
@@ -63,6 +71,11 @@ Identify, from the project's files:
 Implement from the fetched docs pages only:
 
 - Add repositories/dependencies exactly as the integration overview specifies.
+- Apply each enabled adapter's overview page **in full** — beyond the
+  dependency line, adapter pages can require additional Maven repositories,
+  manifest/Info.plist entries, an SDK-track choice, or native asset/view
+  requirements. Skipping these is a build or runtime failure, not an optional
+  extra.
 - Initialize the SDK where the docs say to, with the app key.
 - Implement each ad format per its docs page, including listeners and lifecycle
   (destroy/cleanup) requirements.
@@ -88,6 +101,10 @@ pages if uncertain):
 - Every created ad object has its documented lifecycle handled.
 - Load/show error callbacks are handled; fullscreen ads check readiness before
   showing.
+- Every installed adapter's docs-page requirements are fully met (extra
+  repositories, manifest/Info.plist entries, native view requirements), and
+  the adapter set matches the networks enabled in the publisher's dashboard
+  config.
 - If the app has an existing mediation stack: its code paths are untouched and
   still reachable (coexistence), or fully removed (migration) — per the intent
   established in Detect.

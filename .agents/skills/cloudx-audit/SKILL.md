@@ -25,6 +25,12 @@ and still be wrong or incomplete; the platform changelog page shows what changed
    present.
 3. **Diff code against current docs:**
    - Dependency coordinates and adapter set vs the current documented ones.
+     For each installed adapter, verify its overview page's requirements are
+     fully met (extra Maven repositories, manifest/Info.plist entries, native
+     view requirements). If the publisher's enabled-network set is knowable
+     (ask, or CloudX MCP/CLI `config/show`), flag mismatches both ways:
+     compiled-in adapters for networks not enabled (dead weight) and enabled
+     networks with no adapter in the binary (silent zero contribution).
    - Initialization: documented location, once, before ad loads, correct config.
    - Each ad format: creation, listeners, readiness checks, show requirements,
      lifecycle/destroy handling per the current docs page.
