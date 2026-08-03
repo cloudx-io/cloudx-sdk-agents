@@ -67,6 +67,12 @@ the mediator *removed*, switch to `migrate-from-mediation.md`.
   CMP configured for only one stack leaves the other non-compliant or
   under-monetizing. See `consent-and-cmp.md`; look up the mediator's current
   consent API live.
+- **iOS delegate selector collisions.** Mediator and CloudX delegate
+  protocols can declare same-named Objective-C selectors (observed with
+  AppLovin MAX's ad-view delegate vs CloudX's banner delegate). A single class
+  conforming to both fails to compile or dispatches ambiguously — give each
+  SDK its own delegate/listener object, which the parallel-objects rule above
+  requires anyway.
 - **Header-bidding companions stay put.** Amazon APS or similar companions
   wired into the mediator remain wired to the mediator. Do not route them
   through CloudX.
