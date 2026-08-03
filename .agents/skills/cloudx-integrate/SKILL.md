@@ -78,7 +78,9 @@ Implement from the fetched docs pages only:
   extra.
 - Initialize the SDK where the docs say to, with the app key.
 - Implement each ad format per its docs page, including listeners and lifecycle
-  (destroy/cleanup) requirements.
+  (destroy/cleanup) requirements. Match the page's object lifecycle exactly —
+  if it reuses one instance and calls `load()` again for the next ad, do not
+  create a fresh ad object per cycle (that leaks the old instance).
 - Apply every selected playbook's guidance (init ordering relative to a CMP,
   coexistence wiring, build-system adjustments).
 - Match the project's existing code style and language (Kotlin vs Java,
@@ -98,7 +100,9 @@ Before reporting, verify against the code you just wrote (and re-fetch docs
 pages if uncertain):
 
 - Init happens once, in the documented location, before any ad load.
-- Every created ad object has its documented lifecycle handled.
+- Every created ad object has its documented lifecycle handled, and reload
+  paths reuse instances the way the docs page shows — flag any per-cycle
+  object creation the page doesn't.
 - Load/show error callbacks are handled; fullscreen ads check readiness before
   showing.
 - Every installed adapter's docs-page requirements are fully met (extra
