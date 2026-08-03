@@ -54,23 +54,6 @@ Scenario and native-platform playbooks are seeded with general guidance;
 wrapper-platform playbooks (Unity, React Native, Flutter) start as stubs.
 All grow and harden as real support cases surface.
 
-## Migrating from v1
-
-The previous generation of this repo shipped four Android subagents
-(`@agent-cloudx-android-integrator`, `-auditor`, `-build-verifier`,
-`-privacy-checker`) installed by a curl script into `.claude/agents/`. Those
-files embed an API snapshot that is now two major SDK versions old and
-generates code that no longer compiles. If you installed them:
-
-```bash
-bash scripts/uninstall-legacy.sh
-```
-
-then install the plugin as above. Old invocations map to plain phrases:
-"integrate CloudX" (integrator / build-verifier / privacy-checker) and
-"audit my CloudX integration" (auditor). The v1 tree is preserved at the
-`v1-legacy` tag.
-
 ## Contributing playbooks
 
 Playbooks hold only knowledge absent from [docs.cloudx.io](https://docs.cloudx.io):
