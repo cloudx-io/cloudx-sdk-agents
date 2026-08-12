@@ -15,8 +15,7 @@ wrong and must be updated (CI checks this).
 | `en/<platform>/integration.md` | Always, first. Setup, current version + dependency coordinates, initialization, core features. |
 | `en/<platform>/ad-formats/<format>.md` | Per ad format you implement (`banner-mrec`, `interstitial`, `rewarded`, `app-open`, `native`). Flutter: formats are covered in the integration overview. |
 | `en/<platform>/adapters/<network>/overview.md` | Per bidder network in the adapter set (Android/iOS). Unity uses `en/unity/adapters/<network>.md`. Lists supported formats and the dependency — and may carry required extra steps (additional Maven repositories, manifest/Info.plist entries, SDK-track choices, native asset requirements). Apply the whole page, not just the coordinate. |
-| `en/<platform>/integrations/first-look.md` | Publisher keeps an existing mediation stack and tries CloudX first with fallback (Android/iOS today). Pairs with the `coexist-*` playbooks. |
-| `en/<platform>/trusted-arbiter.md` | Publisher wants CloudX bid comparison against third-party bids. |
+| `en/<platform>/integrations/<mode>.md` and `en/<platform>/trusted-arbiter.md` | The platform's available **setup modes** for running CloudX alongside an existing mediation stack (first look, trusted arbiter, …). The set is open and varies by platform — enumerate what llms.txt actually lists, then fetch the page for every shape in the format → shape matrix. Pairs with `coexist-mediation.md`. |
 | `en/<platform>/changelog.md` | Diagnosing behavior differences between SDK versions, or confirming when an API changed. |
 | `en/<platform>/connectors/<name>/overview.md` | Revenue-connector setup (e.g. AppsFlyer; Android/iOS). |
 

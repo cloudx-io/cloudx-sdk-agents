@@ -57,14 +57,24 @@ Identify, from the project's files:
    publisher which networks are enabled (or read their config via the CloudX
    MCP/CLI `config/show` if they have it set up). Never guess and never
    default to "all".
-3. Fetch the platform's integration overview page, the pages for each ad format
+3. If an existing mediation stack is present (or the user named a setup shape
+   — first look, parallel/Trusted Arbiter, standalone), establish the **setup
+   shape per ad format**. The platform's available modes are the pages under
+   `en/<platform>/integrations/` plus the `trusted-arbiter` family in
+   `llms.txt` — enumerate them live; never assume the set. Ask the publisher
+   format by format if unstated, presenting each mode's own one-line
+   description from the index. Record the format → shape matrix;
+   `coexist-mediation.md` holds the decision procedure and the invariants.
+4. Fetch the platform's integration overview page, the pages for each ad format
    the user wants (default: ask, or start with the formats the app already
-   shows), and the adapter overview page for every network in the adapter set.
-   `references/doc-map.md` explains which page stems answer which questions.
-4. Read the playbooks selected in Detect.
-5. Present a short plan: dependencies to add, files to create/modify, formats to
-   implement, playbook considerations. Confirm with the user if anything is
-   ambiguous (formats, networks, coexistence vs replacement intent).
+   shows), the docs page for every setup shape in the matrix, and the adapter
+   overview page for every network in the adapter set. `references/doc-map.md`
+   explains which page stems answer which questions.
+5. Read the playbooks selected in Detect.
+6. Present a short plan: dependencies to add, files to create/modify, formats to
+   implement with each format's setup shape, playbook considerations. Confirm
+   with the user if anything is ambiguous (formats, networks, setup shape,
+   coexistence vs replacement intent).
 
 ### Phase 3 — Integrate
 
@@ -111,7 +121,8 @@ pages if uncertain):
   config.
 - If the app has an existing mediation stack: its code paths are untouched and
   still reachable (coexistence), or fully removed (migration) — per the intent
-  established in Detect.
+  established in Detect — and each format's wiring matches its row in the
+  setup-shape matrix, as that shape's docs page specifies.
 - Privacy: a CMP writes IAB consent strings before ads load, per the docs
   privacy guidance and the `consent-and-cmp` playbook if selected.
 - No placeholder credentials silently left behind — every placeholder is listed
@@ -119,8 +130,9 @@ pages if uncertain):
 
 ### Phase 6 — Report
 
-Summarize: files changed (with paths), formats implemented, networks/adapters
-enabled, playbooks applied, build result, and required follow-ups (replace
+Summarize: files changed (with paths), formats implemented (with each format's
+setup shape when a mediator coexists), networks/adapters enabled, playbooks
+applied, build result, and required follow-ups (replace
 placeholder app key / ad unit IDs, register the app's bundle ID in the CloudX
 dashboard, CMP configuration). Link the docs pages you used.
 

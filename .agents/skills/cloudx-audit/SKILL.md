@@ -35,9 +35,12 @@ and still be wrong or incomplete; the platform changelog page shows what changed
    - Each ad format: creation, listeners, readiness checks, show requirements,
      lifecycle/destroy handling per the current docs page.
    - Removed/renamed APIs still referenced (changelog is the evidence).
-4. **Coexistence** — if another mediation stack is present: both init paths
-   intact, fallback or first-look wiring per the platform's first-look docs
-   page, no circular loading, per `coexist-mediation.md`.
+4. **Coexistence** — if another mediation stack is present: reconstruct the
+   format → shape matrix from the code (first look / trusted arbiter /
+   standalone split, per format) and audit each format against its shape's
+   docs page — both init paths intact, fallback wiring per
+   `integrations/first-look.md`, arbitration wiring per `trusted-arbiter.md`,
+   no circular loading, per `coexist-mediation.md`.
 5. **Privacy** — CMP writes IAB consent strings before ads load; no usage of
    privacy APIs the changelog marks removed; consent forwarded to any
    coexisting mediation SDK (per `consent-and-cmp.md`).
